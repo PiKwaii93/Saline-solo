@@ -1,0 +1,65 @@
+version: '3.8'
+services:
+  api:
+    build:
+      context: ./api
+      target: production
+    restart: always
+    container_name: api_backend
+    ports:
+      - '4000:4000'
+    networks: 
+      - saline-network
+      - docker-service
+      - db_db-network
+    volumes:
+      - /uploadVideo:/app/uploadVideo 
+
+  client:
+    build:
+      context: ./client
+      target: production
+    restart: always
+    container_name: client_frontend
+    ports:
+      - '3000:3000'
+    networks: 
+      - saline-network
+
+  mariadb:
+    image: mariadb
+    env_file:
+      - .env.docker
+    ports:
+      - 3306:3306
+    networks:
+      - docker-service
+      - mariadb_network
+    volumes:
+      - dbdata:/var/lib/mysql
+
+  adminer:
+    image: adminer
+    restart: always
+    environment:
+      - ADMINER_DEFAULT_DB_DRIVER=mysql
+      - ADMINER_DEFAULT_DB_HOST=mariadb
+    ports:
+      - 8080:8080
+    depends_on:
+      - mariadb
+    networks:
+      - mariadb_network
+
+volumes:
+  dbdata:
+
+networks:
+  saline-network:
+  db_db-network:
+  mariadb_network:
+    external: false
+  docker-service:
+    driver: bridge
+
+# docker compose -f docker-compose.yml up -d --build

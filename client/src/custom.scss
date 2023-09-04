@@ -1,0 +1,29 @@
+@import 'header.scss';
+@import 'header2.scss';
+@import 'footer.scss';
+@import 'login.scss';
+@import 'register.scss';
+@import 'masterclasses.scss';
+@import 'masterclassroom.scss';
+@import 'profil.scss';
+@import 'forum.scss';
+@import 'create-topic.scss';
+
+
+// Font 
+@import url('https://fonts.cdnfonts.com/css/noto-sans');
+@import url('https://fonts.cdnfonts.com/css/open-sans');
+@import url('https://fonts.cdnfonts.com/css/inter');
+
+// Override default variables before the import
+$body-bg: #fff;
+// Import Bootstrap and its default variables
+@import '~bootstrap/scss/bootstrap.scss';
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+a{
+  text-decoration:none
+}

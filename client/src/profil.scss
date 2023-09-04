@@ -1,0 +1,250 @@
+.profil-container-page{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.profil-title-container{
+    display: flex;
+    width: 100%;
+    padding: 25px 0px 4px 0px;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    
+    border-bottom: 1px solid #000;
+}
+
+.profil-title{
+    color: #000;
+
+    /* Typography/Title h1 */
+    font-family: Merriweather;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: 28px;
+}
+
+.profil-container-all{
+    display: flex;
+    width: 100%;
+    padding: 25px;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px 
+}
+
+.profil-container-tab{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+}
+
+.profil-container-information-all{
+    display: flex;
+    padding: 15px;
+    align-items: flex-start;
+    gap: 24px;
+    align-self: stretch;
+
+    border-radius: 10px;
+    background: #F3F2F9;
+}
+
+.profil-picture{
+    width: 85px;
+    height: 85px;
+    border-radius: 100%;
+}
+
+.profil-container-information-text-all{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 13px;
+}
+
+.profil-container-information-text{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.profil-micro-information-text{
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+
+    color: var(--grey-600, #475467);
+
+    /* Typography/Micro Information Text */
+    font-family: "Noto Sans";
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18.2px;
+}
+
+.profil-information-text{
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+
+    color: var(--grey-900, #101828);
+
+    /* Typography/Information Text */
+    font-family: "Noto Sans";
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 21px;
+}
+
+.edit-profil-picture{
+    /* width: 24px;
+    height: 24px; */
+
+    fill: var(--base-white, #FFF);
+    filter: drop-shadow(0px 4px 22px rgba(0, 0, 0, 0.12));
+}
+
+.profil-container-menu-all{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.profil-container-menu-title{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.profil-menu-title{
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+
+    color: var(--grey-900, #101828);
+
+    /* Typography/Title h2 */
+    font-family: Noto Sans;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 28px;
+}
+
+.profil-container-menu-tab{
+    display: flex;
+    width: 100%;
+    /* height: 100%; */
+    padding: 0px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+
+    border-radius: 10px;
+    border: 1px solid var(--grey-300, #D0D5DD);
+    background: #F3F2F9;
+}
+
+.profil-container-menu{
+    display: flex;
+    padding: 16px 0px;
+    align-items: center;
+    gap: 8px;
+    align-self: stretch;
+}
+
+
+.profil-menu-text-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 4px;
+    flex: 1 0 0;
+}
+
+.profil-menu-accordion-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 8px;
+    align-self: stretch;
+}
+
+.profil-menu-accordion-text-container{
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    align-self: stretch;
+}
+
+.profil-menu-certificate-picture{
+    width: 300px;
+}
+
+.profil-menu-certificate-picture{
+    width: 32px;
+}
+
+.profil-menu-accordion-text{
+    width: 60%px;
+    overflow-wrap: anywhere;
+    color: var(--grey-900, #101828);
+
+    /* Section */
+    font-family: Noto Sans;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px; /* 100% */
+}
+
+
+.profil-menu-text{
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+    text-align: left;
+
+    color: var(--grey-900, #101828);
+
+    /* Typography/Menu Title Text */
+    font-family: Noto Sans;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px;
+}
+
+.profil-menu-micro-text{
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+    text-align: left;
+
+    color: var(--grey-500, #667085);
+
+    /* Typography/Micro Information Text */
+    font-family: Noto Sans;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18.2px;
+}
+
+.profil-menu-picture{
+    /* width: 24px;
+    height: 24px; */
+}

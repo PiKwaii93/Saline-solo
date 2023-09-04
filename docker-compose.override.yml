@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  api:
+    build:
+      context: ./api
+      target: development
+    restart: always
+    container_name: api_backend
+    ports:
+      - '4000:4000'
+    command: sh -c "npm i && npm run dev"
+    volumes:
+      - ./api:/app
+    networks: 
+      - nimbus-network
+      - db_db-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  client:
+    build:
+      context: ./client
+      target: development
+    restart: always
+    container_name: client_frontend
+    ports:
+      - '3000:3000'
+    command: sh -c "npm i && npm start"
+    volumes:
+      - ./client:/app
+    networks: 
+      - nimbus-network
+
+
+networks:
+  nimbus-network:
+  db_db-network:
+
+# docker compose up -d --build

@@ -1,0 +1,48 @@
+version: '3.8'
+services:
+  api:
+    build:
+      context: ./api
+      target: production
+    restart: always
+    container_name: api_backend
+    ports:
+      - '4000:4000'
+    networks: 
+      - saline-network
+      - db_db-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  client:
+    build:
+      context: ./client
+      target: production
+    restart: always
+    container_name: client_frontend
+    ports:
+      - '3000:3000'
+    networks: 
+      - saline-network
+
+  db:
+    image: mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: password
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+networks:
+  saline-network:
+    name: saline-network
+    external: true
+  db_db-network:
+    name: db_db-network
+    external: true
+
+# docker compose -f docker-compose.yml up -d --build

@@ -1,0 +1,575 @@
+.masterclassroom-container{
+        display: flex;
+    width: 100%;
+    padding-bottom: 0px;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.masterclassroom-header-container{
+    display: flex;
+    width: 100%;
+    padding: 72px 16px 8px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.masterclassroom-header-title-container{
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.masterclassroom-header-title{
+    color: #000;
+    text-align: center;
+
+    /* Title Mobile */
+    font-family: Inter;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
+
+.masterclassroom-header-information-container{
+    display: flex;
+    padding-right: 0px;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.masterclassroom-header-information-temps-container{
+    display: flex;
+    padding-right: 0px;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.masterclassroom-header-image{
+    display: flex;
+    min-width: 18px;
+    padding: 0px 0.001px;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.masterclassroom-header-information-temps{
+    color: #271A38;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 171.429% */
+}
+
+.masterclassroom-header-information-difficulte-container{
+    display: flex;
+    padding: 0px 15.39px 0.81px 0px;
+    align-items: flex-end;
+    gap: 11.48px;
+}
+
+.masterclassroom-header-information-difficulte{
+    color: #271A38;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 171.429% */
+}
+
+.masterclassroom-progress-container{
+    display: flex;
+    width: 100%;
+    padding: 0px 16px;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+}
+
+.masterclassroom-progress-date-container{
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    gap: 10px;
+    align-self: stretch;
+}
+
+.masterclassroom-progress-date{
+    color: #271A38;
+    text-align: right;
+    font-family: Inter;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 200% */
+}
+
+.masterclassroom-progress-bar-container{
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.masterclassroom-progress-image{
+    display: flex;
+    /* width: 36px; */
+    padding: 7px 7.21px 8px 7.2px;
+/*     justify-content: center;
+    align-items: center;
+    border-radius: 36px;
+    background: rgba(130, 130, 130, 0.60); */
+}
+
+.masterclassroom-progress-bar{
+    display: flex;
+    align-items: flex-start;
+    gap: 3px;
+}
+
+.masterclassroom-progress-bar-group{
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+.masterclassroom-progress-bar-group-unite{
+    display: flex;
+    align-items: flex-start;
+}
+
+.masterclassroom-progress-bar-unite{
+    width: 10.83px;
+    height: 18px;
+    border-bottom: 3px solid rgba(0, 0, 0, 0.25);
+    background: #ECECEC;
+}
+
+.masterclassroom-progress-bar-unite-actif{
+    width: 10.83px;
+    height: 18px;
+    border-bottom: 3px solid rgba(0, 0, 0, 0.25);
+    background: #2e7e32;
+}
+
+.masterclassroom-progress-bar-group-bar{
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    position: absolute;
+}
+
+.masterclassroom-progress-bar-bar{
+    width: 1px;
+    height: 18px;
+    border-left: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.masterclassroom-cours-container{
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.masterclassroom-cours-image{
+    width: 100%;
+    align-self: stretch;
+}
+
+.masterclassroom-cours-container{
+    display: flex;
+    padding: 0px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    align-self: stretch;
+}
+
+.masterclassroom-cours-container-text{
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    align-self: stretch;
+}
+
+.masterclassroom-cours-type-1{
+    flex: 1 0 0;
+    color: #271A38;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 171.429% */
+}
+
+.masterclassroom-cours-type-2{
+    flex: 1 0 0;
+    color: #271A38;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 24px; /* 171.429% */
+}
+
+
+.masterclassroom-change-page-container{
+    display: flex;
+    width: 100%;
+    padding: 40px 16px 0px 16px;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap:16px;
+}
+
+.masterclassroom-change-page-previous-container{
+    width: 50%;
+    display: flex;
+    padding: 8px 20px;
+    align-items: center;
+    gap: 4px;
+    border-radius: 4px;
+    border: 1px solid #000;
+    justify-content: center;
+}
+
+.masterclassroom-change-page-image{
+    display: flex;
+    width: 8.77px;
+    padding: 1.701px 0.038px 0.511px 0.038px;
+    align-items: flex-start;
+}
+
+.masterclassroom-change-page-previous-text{
+    color: #000;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 171.429% */
+}
+
+.masterclassroom-change-page-next-container{
+    width: 50%;
+    display: flex;
+    padding: 8px 20px;
+    align-items: center;
+    gap: 4px;
+    border-radius: 4px;
+    border: 1px solid #000;
+    justify-content: center;
+}
+
+.masterclassroom-change-page-next-text{
+    color: #000;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 171.429% */
+}
+
+
+.masterclassroom-contents-table-container{
+    display: flex;
+    width: 100%;
+    padding: 40px 16px 0px 16px;
+    align-items: flex-start;
+}
+
+.masterclassroom-contents-table-container-all{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 32px;
+}
+
+.masterclassroom-contents-table-title-container{
+    display: flex;
+    padding: 8px 0px;
+    align-items: flex-start;
+    align-self: stretch;
+    border-bottom: 1px solid #DAD9DC;
+}
+
+.masterclassroom-contents-table-title{
+    color: #271A38;
+    font-family: Inter;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 30px; /* 150% */
+}
+
+.masterclassroom-contents-table-chapter-container-all{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 28px;
+}
+
+.masterclassroom-contents-table-chapter-container{
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border-bottom: 1px solid #DAD9DC;
+}
+
+.masterclassroom-contents-table-chapter-icon-container{
+    display: flex;
+    padding: 24px 8px;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+    background: #161C3D;
+}
+
+.masterclassroom-contents-table-icon{
+    display: flex;
+    width: 25.31px;
+    padding: 0.15px 0.103px 0.072px 0.103px;
+    align-items: flex-start;
+}
+
+.masterclassroom-contents-table-chapter-title-container{
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.masterclassroom-contents-table-chapter-title{
+    width: 280px;
+    color: #271A38;
+    font-family: Inter;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 30px; /* 150% */
+}
+
+.masterclassroom-contents-table-image{
+    display: flex;
+    padding: 0px 12px;
+    align-items: flex-start;
+}
+
+.masterclassroom-contents-table-chapter-success-container{
+    display: flex;
+    padding: 10px 8px;
+    align-items: center;
+    align-self: stretch;
+    background: #161C3D;
+}
+
+.masterclassroom-contents-table-success{
+    display: flex;
+    width: 27px;
+    padding: 1.824px 0.111px 1.746px 0.111px;
+    align-items: flex-start;
+}
+
+.masterclassroom-contents-table-chapter-success-title-container{
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.masterclassroom-contents-table-chapter-success-title{
+    color: #271A38;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px; /* 171.429% */
+}
+
+.masterclassroom-ressources-container{
+    display: flex;
+    width: 100%;
+    padding: 40px 16px 0px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.masterclassroom-ressources-container-all{
+    display: flex;
+    padding: 10px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    align-self: stretch;
+    border-radius: 5px;
+    background: #EFEFF0;
+}
+
+.masterclassroom-ressources-title-container{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.masterclassroom-ressources-title{
+    color: #271A38;
+    font-family: Inter;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 30px; /* 150% */
+}
+
+.masterclassroom-ressources-link-container-all{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    align-self: stretch;
+}
+
+.masterclassroom-ressources-link-container{
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    align-self: stretch;
+    border-bottom: 1px solid #DAD9DC;
+    background: #777778;
+}
+
+.masterclassroom-ressources-link-icon-container{
+    display: flex;
+    padding: 16px 8px;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+    background: #161C3D;
+}
+
+.masterclassroom-ressources-icon{
+    display: flex;
+    width: 17.83px;
+    padding: 0.134px 0.19px 0.064px 0.19px;
+    align-items: flex-start;
+}
+
+.masterclassroom-ressources-link-bar-container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex: 1 0 0;
+}
+
+.masterclassroom-ressources-link-text-container{
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.masterclassroom-ressources-link-text{
+    width: 280px;
+    color: #FFF;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;
+}
+
+.masterclassroom-ressources-image{
+    display: flex;
+    padding: 0px 12px;
+    align-items: flex-start;
+}
+
+.masterclassroom-exercices-container{
+    display: flex;
+    width: 100%;
+    padding: 40px 16px 0px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.masterclassroom-exercices-container-all{
+    display: flex;
+    padding: 10px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    align-self: stretch;
+    border-radius: 5px;
+    background: #161C3D;
+}
+
+.masterclassroom-exercices-title-container{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.masterclassroom-exercices-title{
+    color: #FFF;
+    font-family: Inter;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 30px; /* 150% */
+}
+
+.masterclassroom-exercices-link-container-all{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    align-self: stretch;
+}
+
+.masterclassroom-exercices-link-container{
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    align-self: stretch;
+    background: #FFF;
+}
+
+.masterclassroom-exercices-link-icon-container{
+    display: flex;
+    padding: 16px 8px;
+    align-items: center;
+    gap: 10px;
+    background: #777778;
+}
+
+.masterclassroom-exercices-icon{
+    display: flex;
+    align-items: center;
+}
+
+.masterclassroom-exercices-link-bar-container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex: 1 0 0;
+}
+
+.masterclassroom-exercices-link-text-container{
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.masterclassroom-exercices-link-text{
+    width: 280px;
+    color: #000;
+    font-family: Inter;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 30px; /* 187.5% */
+}
+
+.masterclassroom-exercices-image{
+    display: flex;
+    padding: 0px 12px;
+    align-items: flex-start;
+}
