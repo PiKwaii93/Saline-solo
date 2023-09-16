@@ -1,29 +1,59 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import useMasterclass from "../hooks/useMasterclass";
+import useMasterclassAll from "../hooks/useMasterclassAll";
 import { useLocation } from "react-router-dom";
+import useGetImageByMasterclassID from "../hooks/useGetImageByMasterclassID";
 
 
 export default function Masterclasses() {
   
     const [allMasterclasses, setAllMasterclasses] = useState([])
 
-    const masterclass = useMasterclass()
+    const [allMasterclassesTemp, setAllMasterclassesTemp] = useState([])
+
+    const masterclassAll = useMasterclassAll()
+
+    const getImageByMasterclassID = useGetImageByMasterclassID()
 
     useEffect(() => {
-      masterclass().then(data =>{if(data.result.length!=0){setAllMasterclasses(data.result)}})
+      masterclassAll().then(data =>{if(data.result.length!=0){setAllMasterclassesTemp(data.result)}})
     }, []);
 
 
     useEffect(() => {
-      if(allMasterclasses.length!=0)console.log(allMasterclasses)
-    }, [allMasterclasses]);
+      if(allMasterclassesTemp.length!=0){
+        
+        const fetchData = async () => {
+          const newArray = [];
+    
+          await Promise.all(
+            allMasterclassesTemp.map(async (item) => {
+              const data = await getImageByMasterclassID(item.id);
+              const imageBlob = data;
+              const imageUrl = URL.createObjectURL(imageBlob);
+              item.image = imageUrl;
+              newArray.push(item);
+            })
+          );
+          setAllMasterclasses(newArray);
+        };
+    
+        fetchData();
+
+      }
+
+    }, [allMasterclassesTemp]);
+
+    useEffect(()=>{
+      console.log(allMasterclasses)
+    },[allMasterclasses])
 
     const [inputValue, setInputValue] = useState('');
 
     const handleChange = (event) => {
       setInputValue(event.target.value);
     };
+
 
 
 
@@ -37,7 +67,7 @@ export default function Masterclasses() {
           if(cours.title.includes(inputValue)) {
             return <div className="masterclasses-cours-container" key={index}>
                       <div className="masterclasses-cours-container-tab">
-                        <img src={`/masterclasses_${cours.title}.png`} alt={`Masterclass ${cours.title}`} className="masterclasses-cours-image"/>
+                        <img src={cours && cours.image ? cours.image : "/random.png"} alt={`Masterclass ${cours.title}`} className="masterclasses-cours-image"/>
                         <Link to={`/masterclassroom/${cours.title}/1`}>
                           <button className="masterclasses-cours-button">Accéder aux cours</button>
                         </Link>

@@ -1,12 +1,58 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch } from 'react-redux';
 import { Link } from "react-router-dom";
+import useTopicAll from "../hooks/useTopicAll";
+import useMessageAllByTopic from "../hooks/useMessageAllByTopic";
+import useFindUserByID from "../hooks/useFindUserByID";
 
 
 export default function Forum(){
-  
 
-  const dispatch = useDispatch();
+
+    const [allTopic, setAllTopic] = useState([]);
+    const [allDataTopic, setAllDataTopic] = useState([]);
+    const topicAll = useTopicAll();
+    const messageAllByTopic = useMessageAllByTopic();
+    const findUserByID = useFindUserByID();
+  
+    useEffect(() => {
+      topicAll().then(data => setAllTopic(data.result));
+    }, []);
+  
+    useEffect(() => {
+      if (allTopic.length !== 0) {
+        let tempArray = [];
+        let promises = [];
+  
+        for (let x = 0; x < allTopic.length; x++) {
+          let tempObjet = allTopic[x];
+          
+          // Collect all promises in an array
+          promises.push(
+            messageAllByTopic(allTopic[x].id).then(data => {
+              tempObjet.messages = data.result.length;
+            }),
+            findUserByID(allTopic[x].userID).then(data => {
+              tempObjet.userName = data.result[0].firstname + " " + data.result[0].lastname;
+            })
+          );
+          tempArray.push(tempObjet);
+        }
+        
+        // Wait for all promises to resolve
+        Promise.all(promises).then(() => {
+          setAllDataTopic(tempArray); // Update the state once all promises are resolved
+        });
+      }
+    }, [allTopic]);
+  
+    useEffect(() => {
+      if (allDataTopic.length !== 0) {
+        console.log(allDataTopic);
+      }
+    }, [allDataTopic]);
+
+  
 
   
 
@@ -58,44 +104,52 @@ export default function Forum(){
                         </div>
                     </div>
                     <div className="forum-subject-container">
-                    <div className="forum-subject-container-one">
-                            <div className="forum-subject-pins-container">
-                                <img src="/Pins.svg" alt="Etat du sujet" className="forum-pins-picture"></img>
-                            </div>
-                            <div className="forum-subject-information-container">
-                                <div className="forum-subject-title-container">
-                                    <span className="forum-subject-title">Sujet Lorem ipsum</span>
+                        {allDataTopic.map(item => (
+                            <Link to={"/topic/"+item.id} key={item.id} style={{    width:" 100%"}}>
+                                {item.id % 2 === 0 ? 
+                                <div key={item.id} className="forum-subject-container-second">
+                                    <div className="forum-subject-pins-container">
+                                        <img src="/Pins.svg" alt="Etat du sujet" className="forum-pins-picture"></img>
+                                    </div>
+                                    <div className="forum-subject-information-container">
+                                        <div className="forum-subject-title-container">
+                                            <span className="forum-subject-title">{item.title}</span>
+                                        </div>
+                                        <div className="forum-subject-number-message-container">
+                                            <span className="forum-subject-number-message">({item.messages})</span>
+                                        </div>
+                                        <div className="forum-subject-author-container">
+                                            <span className="forum-subject-author">{item.userName}</span>
+                                        </div>
+                                    </div>
+                                    <div className="forum-subject-date-container">
+                                        <span className="forum-subject-date">01/03/2023</span>
+                                    </div>
                                 </div>
-                                <div className="forum-subject-number-message-container">
-                                    <span className="forum-subject-number-message">(28)</span>
+                                : 
+                                <div key={item.id} className="forum-subject-container-one">
+                                    <div className="forum-subject-pins-container">
+                                        <img src="/Pins.svg" alt="Etat du sujet" className="forum-pins-picture"></img>
+                                    </div>
+                                    <div className="forum-subject-information-container">
+                                        <div className="forum-subject-title-container">
+                                            <span className="forum-subject-title">{item.title}</span>
+                                        </div>
+                                        <div className="forum-subject-number-message-container">
+                                            <span className="forum-subject-number-message">({item.messages})</span>
+                                        </div>
+                                        <div className="forum-subject-author-container">
+                                            <span className="forum-subject-author">{item.userName}</span>
+                                        </div>
+                                    </div>
+                                    <div className="forum-subject-date-container">
+                                        <span className="forum-subject-date">01/03/2023</span>
+                                    </div>
                                 </div>
-                                <div className="forum-subject-author-container">
-                                    <span className="forum-subject-author">Auteur</span>
-                                </div>
-                            </div>
-                            <div className="forum-subject-date-container">
-                                <span className="forum-subject-date">01/03/2023</span>
-                            </div>
-                        </div>
-                        <div className="forum-subject-container-second">
-                            <div className="forum-subject-pins-container">
-                                <img src="/Pins.svg" alt="Etat du sujet" className="forum-pins-picture"></img>
-                            </div>
-                            <div className="forum-subject-information-container">
-                                <div className="forum-subject-title-container">
-                                    <span className="forum-subject-title">Sujet Lorem ipsum</span>
-                                </div>
-                                <div className="forum-subject-number-message-container">
-                                    <span className="forum-subject-number-message">(28)</span>
-                                </div>
-                                <div className="forum-subject-author-container">
-                                    <span className="forum-subject-author">Auteur</span>
-                                </div>
-                            </div>
-                            <div className="forum-subject-date-container">
-                                <span className="forum-subject-date">01/03/2023</span>
-                            </div>
-                        </div>
+                            }</Link>
+                            
+                            
+                        ))}
                     </div>
                 </div>
                 <div className="forum-navigate-container">

@@ -12,7 +12,6 @@ const initialState = {
   email: '',
   token: '',
   errorMessage: '',
-  profilPicture: '',
   role:'',
 };
 

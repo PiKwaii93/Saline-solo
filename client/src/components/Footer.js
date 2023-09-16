@@ -17,10 +17,10 @@ export default class Footer extends React.Component {
                 </div>
                 <div className="footer-question-newsletter-medias-container">
                   <div className="footer-question-newsletter-medias-container-tab">
-                    <img src="/Instagram-white.png.svg" alt="Instagram" className="footer-question-newsletter-medias"></img>
-                    <img src="/Facebook-white.png.svg" alt="Facebook" className="footer-question-newsletter-medias"></img>
-                    <img src="/Linkedin-white.png.svg" alt="Linkedin" className="footer-question-newsletter-medias"></img>
-                    <img src="/Youtube-white.png.svg" alt="Youtube" className="footer-question-newsletter-medias"></img>
+                    <img src="/instagram.svg" alt="Instagram" className="footer-question-newsletter-medias"></img>
+                    <img src="/facebook.svg" alt="Facebook" className="footer-question-newsletter-medias"></img>
+                    <img src="/linkedin.svg" alt="Linkedin" className="footer-question-newsletter-medias"></img>
+                    <img src="/youtube.svg" alt="Youtube" className="footer-question-newsletter-medias"></img>
                   </div>
                 </div>
               </div>

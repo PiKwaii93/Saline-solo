@@ -13,7 +13,10 @@ services:
       - docker-service
       - db_db-network
     volumes:
-      - /uploadVideo:/app/uploadVideo 
+      - /uploadVideo/cours:/app/uploadVideo/cours
+      - /uploadImage/profil:/app/uploadImage/profil
+      - /uploadImage/masterclass:/app/uploadImage/masterclass
+      
 
   client:
     build:

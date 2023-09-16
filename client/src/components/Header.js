@@ -94,6 +94,26 @@ export default function Header(){
                         <span className="menu-burger-link">Forum</span>
                       </div>
                     </Link>
+                    <Link to="/create-cours" className="menu-burger-link-prevent-style">
+                      <div className="menu-burger-link-container">
+                        <span className="menu-burger-link">Create Cours</span>
+                      </div>
+                    </Link>
+                    <Link to="/create-masterclass" className="menu-burger-link-prevent-style">
+                      <div className="menu-burger-link-container">
+                        <span className="menu-burger-link">Create Masterclass</span>
+                      </div>
+                    </Link>
+                    <Link to="/create-quizz" className="menu-burger-link-prevent-style">
+                      <div className="menu-burger-link-container">
+                        <span className="menu-burger-link">Create Quizz</span>
+                      </div>
+                    </Link>
+                    <Link to="/create-exams" className="menu-burger-link-prevent-style">
+                      <div className="menu-burger-link-container">
+                        <span className="menu-burger-link">Create Exams</span>
+                      </div>
+                    </Link>
                     <HideIfNotLogged>
                       <div className="menu-burger-link-container" onClick={() => dispatch(disconnect())}>
                         <span className="menu-burger-link">Disconnect</span>

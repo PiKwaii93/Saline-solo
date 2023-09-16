@@ -4,12 +4,23 @@ import useMasterclassesCours from "../hooks/useMasterclassesCours";
 import useMasterclassesCoursAll from "../hooks/useMasterclassesCoursAll";
 import { useParams, Link, useFetcher } from 'react-router-dom'
 import { useNavigate } from "react-router-dom";
-import useMasterclassQuizzAll from "../hooks/useMasterclassQuizzAll";
+import useMasterclassQuizzAllByMasterclassID from "../hooks/useMasterclassQuizzAllByMasterclassID";
 import useMasterclassExamsAll from "../hooks/useMasterclassExamsAll";
+import useMasterclassConfirmModule from "../hooks/useMasterclassConfirmModule";
+import useMasterclassCheckConfirmModule from "../hooks/useMasterclassCheckConfirmModule";
+import { useSelector } from "react-redux";
+import useGetImageByMasterclassID from "../hooks/useGetImageByMasterclassID";
+import "easymde/dist/easymde.min.css";
+import { SimpleMdeReact } from "react-simplemde-editor";
+import {marked} from 'marked'
+import ReactMarkdown from "react-markdown";
 
 
 
 export default function Masterclassroom() {
+
+  
+  const user = useSelector((state) => state.user);
 
   
   const navigate = useNavigate();
@@ -34,24 +45,56 @@ export default function Masterclassroom() {
 
   const [dataMasterclassExamsAll, setDataMasterclassExamsAll] = useState([])
 
+  const [dataConfirmModule, setDataConfirmMoudle] = useState({
+    masterclassCoursID: "",
+    progress: "",
+    userID: ""
+  })
+
   const handle = useParams()
 
   const masterclassFindOne = useMasterclassFindOne();
 
   const masterclassesCours = useMasterclassesCours();
 
-  const masterclassQuizzAll = useMasterclassQuizzAll()
+  const masterclassQuizzAll = useMasterclassQuizzAllByMasterclassID()
   
   const masterclassExamsAll = useMasterclassExamsAll()
 
   const masterclassesCoursAll = useMasterclassesCoursAll();
 
+  const masterclassConfirmModule = useMasterclassConfirmModule()
+
+  const masterclassCheckConfirmModule = useMasterclassCheckConfirmModule()
   
-  const [tempProgress, setTempProgress] = useState('<div class="masterclassroom-progress-bar-group"></div>')
+  const getImageByMasterclassID = useGetImageByMasterclassID()
+
+  
+  const [imageURL, setImageURL] = useState("/noOne.png");
+
+  function getImage(masterclassID){
+
+    getImageByMasterclassID(masterclassID).then(data => {
+      const imageBlob = data;
+      const imageUrl = URL.createObjectURL(imageBlob);
+      setImageURL(imageUrl); 
+    }).catch(error => {
+      setImageURL('/random.png')
+      console.error('Erreur lors de la récupération de l\'image :', error);
+    });
+  }
+
+
+
+  
+  const [tempProgress, setTempProgress] = useState('<div class="masterclassroom-progress-bar"></div>')
+
+  let progressBarGroup = `<div class="masterclassroom-progress-bar-group">`
 
   let tempUnite = `<div class="masterclassroom-progress-bar-group-unite">`
 
   let tempBar = `<div  class="masterclassroom-progress-bar-group-bar">`
+
 
 
   useEffect(() => {
@@ -61,6 +104,7 @@ export default function Masterclassroom() {
   
   useEffect(() => {
     if(dataMasterclassFindOne.id!=""){
+      getImage(dataMasterclassFindOne.id)
       masterclassesCours(dataMasterclassFindOne.id, handle.page).then(data =>{if(data.result.length!=0){if(data.result[0].text == "QUIZZ"){navigate("/quizz/"+handle.slug+"/"+handle.page)}else if(data.result[0].text == "EXAMS"){navigate("/exams/"+handle.slug+"/"+handle.page)}else{setDataMasterclassCours(data.result[0])}}else{setDataMasterclassCours({
         id:"",
         text:"",
@@ -70,6 +114,7 @@ export default function Masterclassroom() {
       masterclassesCoursAll(dataMasterclassFindOne.id).then(data =>{setDataMasterclassCoursAll(data.result)})
       masterclassQuizzAll(dataMasterclassFindOne.id).then(data =>{setDataMasterclassQuizzAll(data.result)})
       masterclassExamsAll(dataMasterclassFindOne.id).then(data =>{setDataMasterclassExamsAll(data.result)})
+      masterclassCheckConfirmModule(user.id, dataMasterclassFindOne.id, handle.page).then(data => {if(data.result[0]!=undefined)setDataConfirmMoudle(data.result[0])})
     }
   }, [dataMasterclassFindOne]);
 
@@ -109,19 +154,34 @@ export default function Masterclassroom() {
       tempBar+=`<div class="masterclassroom-progress-bar-bar"></div>`
 
       if(tempAllPage2[x].idQuizz!=undefined || tempAllPage2[x].idExams!=undefined){
-        tempUnite+=`</div><div class="masterclassroom-progress-bar-group-unite">`
-        tempBar+=`</div><div  class="masterclassroom-progress-bar-group-bar">`
-      }
-  
-      if(x==tempAllPage2.length - 1){
         tempUnite+=`</div>`
-        tempBar+=`</div>` 
+        tempBar+=`</div>`
+        progressBarGroup += tempUnite + tempBar + `</div><div class="masterclassroom-progress-bar-group">`
+        tempUnite = `<div class="masterclassroom-progress-bar-group-unite">`
+        tempBar = `<div  class="masterclassroom-progress-bar-group-bar">`
+      }
+
+      if(x==tempAllPage2.length - 1){
+        progressBarGroup +=  tempUnite + tempBar + `</div>`
       }
     }
 
     
-    setTempProgress(`<div class="masterclassroom-progress-bar-group">`+tempUnite + tempBar + `</div>`)
+    setTempProgress(progressBarGroup)
   }, [dataMasterclassCoursAll]);
+
+
+
+/*   useEffect(()=>{
+    if(dataConfirmModule.userID!=""){
+      console.log(dataConfirmModule)
+    }
+  },[dataConfirmModule]) */
+
+
+  let confirmModule = function confirmModuleFunction() {
+    masterclassConfirmModule(user.id, dataMasterclassFindOne.id, handle.page)
+  }
 
   
 
@@ -170,9 +230,12 @@ export default function Masterclassroom() {
         </div>
         <div className="masterclassroom-cours-container">
           <div>
-            <img src={`/masterclasses_${dataMasterclassFindOne.title}.png`} alt={dataMasterclassFindOne.title} className="masterclassroom-cours-image"/> {/* {dataMasterclassFindOne.title} */}
+            <img src={imageURL} alt={dataMasterclassFindOne.title} className="masterclassroom-cours-image"/> 
           </div>
-          <div dangerouslySetInnerHTML={{__html: dataMasterclassCours.text}}></div>
+          <ReactMarkdown className="topic-text" children={dataMasterclassCours.text} />
+        </div>
+        <div className="masterclassroom-confirm-container">
+          <button className="masterclassroom-confirm-text-container" onClick={confirmModule}>Confirmer le module</button>
         </div>
         <div className="masterclassroom-change-page-container">
           <Link to={linkToPrecedent}  className="masterclassroom-change-page-previous-container">

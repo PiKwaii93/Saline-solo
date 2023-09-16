@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import useMasterclassFindOne from "../hooks/useMasterclassFindOne";
 import useMasterclassesCours from "../hooks/useMasterclassesCours";
 import useMasterclassesCoursAll from "../hooks/useMasterclassesCoursAll";
-import useMasterclassQuizzAll from "../hooks/useMasterclassQuizzAll";
+import useMasterclassQuizzAllByMasterclassID from "../hooks/useMasterclassQuizzAllByMasterclassID";
 import useMasterclassExamsAll from "../hooks/useMasterclassExamsAll";
 import useMasterclassExams from "../hooks/useMasterclassExams";
 import useMasterclassExamsQuestion from "../hooks/useMasterclassExamsQuestion";
@@ -11,6 +11,7 @@ import useCertificatesFindOneByMasterclassID from "../hooks/useCertificatesFindO
 import { useSelector } from 'react-redux';
 import useCheckUsersCertificates from "../hooks/useCheckUsersCertificates";
 import useNewUsersCertificates from "../hooks/useNewUsersCertificates";
+import useGetImageByMasterclassID from "../hooks/useGetImageByMasterclassID";
 
 
 
@@ -66,7 +67,7 @@ export default function Exams() {
 
   const masterclassesCoursAll = useMasterclassesCoursAll();
 
-  const masterclassQuizzAll = useMasterclassQuizzAll()
+  const masterclassQuizzAll = useMasterclassQuizzAllByMasterclassID()
 
   const masterclassExamsAll = useMasterclassExamsAll()
 
@@ -80,9 +81,28 @@ export default function Exams() {
 
   const checkUsersCertificates = useCheckUsersCertificates()
 
+  const getImageByMasterclassID = useGetImageByMasterclassID()
 
   
-  const [tempProgress, setTempProgress] = useState('<div class="masterclassroom-progress-bar-group"></div>')
+  const [imageURL, setImageURL] = useState("/noOne.png");
+
+  function getImage(masterclassID){
+
+    getImageByMasterclassID(masterclassID).then(data => {
+      const imageBlob = data;
+      const imageUrl = URL.createObjectURL(imageBlob);
+      setImageURL(imageUrl); 
+    }).catch(error => {
+      setImageURL('/random.png')
+      console.error('Erreur lors de la récupération de l\'image :', error);
+    });
+  }
+
+
+  
+  const [tempProgress, setTempProgress] = useState('<div class="masterclassroom-progress-bar"></div>')
+
+  let progressBarGroup = `<div class="masterclassroom-progress-bar-group">`
 
   let tempUnite = `<div class="masterclassroom-progress-bar-group-unite">`
 
@@ -96,6 +116,7 @@ export default function Exams() {
 
   useEffect(() => {
     if(dataMasterclassFindOne.id!=""){
+      getImage(dataMasterclassFindOne.id)
       masterclassExams(dataMasterclassFindOne.id, handle.page).then(data=>{if(data.result[0]!=undefined)setDataMasterclassExams(data.result[0])})
       masterclassesCoursAll(dataMasterclassFindOne.id).then(data =>{setDataMasterclassCoursAll(data.result)})
       masterclassExamsAll(dataMasterclassFindOne.id).then(data =>{setDataMasterclassExamsAll(data.result)})
@@ -176,6 +197,7 @@ export default function Exams() {
         }
       }
 
+
       setCorrectAnswerMessage(tempCorrectAnswerMessage)
 
       if(check == false){
@@ -186,6 +208,7 @@ export default function Exams() {
       }
     }
   };
+
   
 
   useEffect(() => {
@@ -230,18 +253,20 @@ export default function Exams() {
       tempBar+=`<div class="masterclassroom-progress-bar-bar"></div>`
 
       if(tempAllPage2[x].idQuizz!=undefined || tempAllPage2[x].idExams!=undefined){
-        tempUnite+=`</div><div class="masterclassroom-progress-bar-group-unite">`
-        tempBar+=`</div><div  class="masterclassroom-progress-bar-group-bar">`
-      }
-  
-      if(x==tempAllPage2.length - 1){
         tempUnite+=`</div>`
-        tempBar+=`</div>` 
+        tempBar+=`</div>`
+        progressBarGroup += tempUnite + tempBar + `</div><div class="masterclassroom-progress-bar-group">`
+        tempUnite = `<div class="masterclassroom-progress-bar-group-unite">`
+        tempBar = `<div  class="masterclassroom-progress-bar-group-bar">`
+      }
+
+      if(x==tempAllPage2.length - 1){
+        progressBarGroup +=  tempUnite + tempBar + `</div>`
       }
     }
 
     
-    setTempProgress(`<div class="masterclassroom-progress-bar-group">`+tempUnite + tempBar + `</div>`)
+    setTempProgress(progressBarGroup)
   }, [dataMasterclassCoursAll]);
 
   
@@ -291,31 +316,31 @@ export default function Exams() {
         </div>
         <div className="masterclassroom-cours-container">
           <div>
-            <img src={`/masterclasses_${dataMasterclassFindOne.title}.png`} alt={dataMasterclassFindOne.title} className="masterclassroom-cours-image"/> {/* {dataMasterclassFindOne.title} */}
+            <img src={imageURL} alt={dataMasterclassFindOne.title} className="masterclassroom-cours-image"/> {/* {dataMasterclassFindOne.title} */}
           </div>
           <form noValidate onSubmit={handleSubmit} className='form-container'>
             {dataMasterclassExamsQuestion.map(item => (
               <div key={item.id}>
                 {correctAnswerMessage.length!=0 ? 
-                  <span dangerouslySetInnerHTML={{__html: correctAnswerMessage[parseInt(item.id) - 1]}}></span> 
+                  <span dangerouslySetInnerHTML={{__html: correctAnswerMessage[parseInt(item.idExamsQuestions) - 1]}}></span> 
                   : 
                   <></>
                 }
                 <p>Question : {item.question}</p>
                 <div>
-                  <input type='radio' name={"answer"+item.id} value="1" onChange={handleChange}/>
+                  <input type='radio' name={"answer"+item.idExamsQuestions} value="1" onChange={handleChange}/>
                   <label htmlFor={item.answer1}>{item.answer1}</label>
                 </div>
                 <div>
-                  <input type='radio' name={"answer"+item.id} value="2" onChange={handleChange}/>
+                  <input type='radio' name={"answer"+item.idExamsQuestions} value="2" onChange={handleChange}/>
                   <label htmlFor={item.answer2}>{item.answer2}</label>
                 </div>
                 <div>
-                  <input type='radio' name={"answer"+item.id} value="3" onChange={handleChange}/>
+                  <input type='radio' name={"answer"+item.idExamsQuestions} value="3" onChange={handleChange}/>
                   <label htmlFor={item.answer3}>{item.answer3}</label>
                 </div>
                 <div>
-                  <input type='radio' name={"answer"+item.id} value="4" onChange={handleChange}/>
+                  <input type='radio' name={"answer"+item.idExamsQuestions} value="4" onChange={handleChange}/>
                   <label htmlFor={item.answer4}>{item.answer4}</label>
                 </div>
               </div>

@@ -120,77 +120,55 @@ export function register(req, res) {
 
 export function updateUsersInformation(req, res) {
   const { lastName, firstName, email, id } = req.body;
-  if (id){
-    try {
-      pool
-      .query(
-        `SELECT * FROM users WHERE id='${id}' LIMIT 1`
-      ).then((response) => {
-        if(response.length!=0){
-          let checkEmail = false;
-          let checkLastName= false;
-          let checkFirstName = false;
-          if(email=="" || email==undefined){
-            checkEmail = true
-          }
-          if(lastName=="" || lastName==undefined){
-            checkLastName = true
-          }
-          if(firstName=="" || firstName==undefined){
-            checkFirstName = true
-          }
-          if (checkEmail==false || checkLastName==false || checkFirstName==false ){
-            let newEmail = email
-            let newLastName = lastName
-            let newFirstName = firstName
-            if(checkEmail==true){
-              newEmail = response[0].email
-            }
-            if(checkLastName==true){
-              newFirstName = response[0].firstname
-            }
-            if(checkFirstName==true){
-              newLastName = response[0].lastname
-            }
-            try{
-              pool
-                .query(
-                  `UPDATE users SET firstname='${newFirstName}', lastname='${newLastName}', email='${newEmail}' WHERE id='${id}'`
-                )
-                .then((response2)=>{
-                  res.status(202).json({
-                    status: 'Success',
-                    user: {
-                      lastName: newLastName,
-                      firstName: newFirstName,
-                      email : newEmail,
-                      id: id
-                    },
-                  });
-                })
-            }
-            catch (e){
-              res.status(400).json({
-                status: 'Failed',
-                message: 'Request failed on UPDATE',
-              });
-            }
-          }else{
-            res.status(400).json({
-              status: 'Failed',
-              message: 'Inputs missing',
-            });
-          }
-        }
-      })
-    } catch (e) {
-        res.status(400).json({
-            status: 'Failed',
-            message: 'Request failed',
-        });
-    } 
+
+  if (!id) {
+      return res.status(400).json({
+          status: 'Failed',
+          message: 'Invalid user ID provided',
+      });
   }
 
+  try {
+      pool.query(
+          `SELECT * FROM users WHERE id='${id}' LIMIT 1`
+      ).then((response) => {
+          if (response.length === 0) {
+              return res.status(400).json({
+                  status: 'Failed',
+                  message: 'User not found',
+              });
+          }
+
+          const existingUser = response[0];
+          const newLastName = lastName || existingUser.lastname;
+          const newFirstName = firstName || existingUser.firstname;
+          const newEmail = email || existingUser.email;
+
+          pool.query(
+              `UPDATE users SET firstname='${newFirstName}', lastname='${newLastName}', email='${newEmail}' WHERE id='${id}'`
+          ).then((response2) => {
+              res.status(202).json({
+                  status: 'Success',
+                  user: {
+                      lastName: newLastName,
+                      firstName: newFirstName,
+                      email: newEmail,
+                      id: id
+                  },
+              });
+          }).catch((error) => {
+              res.status(400).json({
+                  status: 'Failed',
+                  message: 'Request failed on UPDATE',
+              });
+          });
+      });
+  } catch (e) {
+      res.status(400).json({
+          status: 'Failed',
+          message: 'Request failed',
+      });
+  }
 }
 
 export function updateUsersPassword(req, res) {
@@ -245,4 +223,26 @@ export function updateUsersPassword(req, res) {
       message: 'Inputs missing',
     });
   }
+}
+
+export function findUserByID(req, res) {
+  const {userID} = req.body
+  if(userID)
+  try {
+      pool
+          .query(
+              `SELECT * FROM users WHERE id=${userID};`
+          )
+          .then((result) => {
+              res.status(202).json({
+                  result
+              });
+          });
+  } catch (e) {
+      res.status(400).json({
+          status: 'Failed',
+          message: 'Request failed',
+      });
+  } 
+
 }

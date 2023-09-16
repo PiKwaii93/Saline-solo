@@ -1,14 +1,11 @@
 import axios from 'axios';
 import { urlUsed } from '../constantes';
 
-export default function useMasterclass() {
-  return (slug) => {
+export default function useMasterclassAll() {
+  return () => {
     return axios({
-      url: urlUsed + '/foo/masterclass',
+      url: urlUsed + '/foo/masterclassAll',
       method: 'get',
-      data: {
-        slug: slug,
-      },
       headers: { 'Content-Type': 'application/json' },
     })
       .then((res) => res.data)

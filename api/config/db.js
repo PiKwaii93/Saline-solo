@@ -27,4 +27,4 @@ pool.getConnection((err, connexion) => {
 export default pool;
 
 
-/* mariadb --user root -ppassword */
+/* mariadb --user root -ppassword */ 

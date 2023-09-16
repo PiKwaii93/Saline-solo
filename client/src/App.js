@@ -23,7 +23,11 @@ import Exams from "./components/Exams";
 import Forum from "./components/Forum";
 import CreateTopic from "./components/CreateTopic";
 import GetVideo from "./components/GetVideo";
-
+import Topic from "./components/Topic";
+import CreateCours from "./components/CreateCours";
+import CreateMasterclass from "./components/CreateMasterclass";
+import CreateQuizz from "./components/CreateQuizz";
+import CreateExams from "./components/CreateExams";
 export default function App() {
 
 
@@ -54,6 +58,11 @@ export default function App() {
                           <Route path="/getVideo" element={<GetVideo/>}/>
                           <Route path="/forum" element={<Forum/>}/>
                           <Route path="/create-topic" element={<CreateTopic/>}/>
+                          <Route path="/topic/:idTopic" element={<Topic/>}/>
+                          <Route path="/create-cours" element={<CreateCours/>}/>
+                          <Route path="/create-masterclass" element={<CreateMasterclass/>}/>
+                          <Route path="/create-quizz" element={<CreateQuizz/>}/>
+                          <Route path="/create-exams" element={<CreateExams/>}/>
                           <Route path="*" element={<NoPage />} />
                         </Route>
                       </Routes>

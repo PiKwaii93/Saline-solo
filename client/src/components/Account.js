@@ -5,8 +5,11 @@ import { useSelector } from 'react-redux';
 import useUsersCertificates from "../hooks/useCertificatesFindOne";
 import useCertificatesFindOneByMasterclassID from "../hooks/useCertificatesFindOneByMasterclassID";
 import useCertificatesFindOneByCertificatesID from "../hooks/useCertificatesFindOneByCertificatesID";
+import useGetImageByUserID from "../hooks/useGetImageByUserID";
+import useUploadProfilPicture from "../hooks/useUploadProfilPicture";
 import axios from "axios";
 import { urlUsed } from "../constantes";
+import useGetImageByCertificatesID from "../hooks/useGetImageByCertificatesID";
 
 
 export default function Account() {
@@ -14,6 +17,8 @@ export default function Account() {
       const dispatch = useDispatch();
 
       const [allUsersCertificates, setAllUsersCertificates] = useState([])
+
+      const [allUsersImageCertificates, setAllUsersImageCertificates] = useState([])
   
       const user = useSelector((state) => state.user);
 
@@ -25,43 +30,45 @@ export default function Account() {
 
       const certificatesFindOneByCertificatesID = useCertificatesFindOneByCertificatesID()
 
+      const getImageByCertificatesID = useGetImageByCertificatesID()
+
+      const uploadProfilPicture = useUploadProfilPicture()
+
+      const getImageByUserID = useGetImageByUserID()
+
       useEffect(() => {
         usersCertificates(user.id).then(data => {if(data.result.length!=0)setDataUsersCertificates(data.result)})
       },[])
 
       useEffect(() => {
         if(dataUsersCertificates.length!=0){
-          setAllUsersCertificates([])
+          let tempAllCertificates = []
+          let tempAllImageCertificates = []
           for(let x=0; x<dataUsersCertificates.length; x++){
-            certificatesFindOneByCertificatesID(dataUsersCertificates[x].certificatesID).then(data => {
-              if(allUsersCertificates.length!=0){
-                for(let x=0; x<allUsersCertificates.length; x++){
-                  if(allUsersCertificates[x].hasOwnProperty("id") && allUsersCertificates[x]["id"] === data.result[0].id){
-                    
-                  }
-                }
-              }else{
-                setAllUsersCertificates((prev) => [...prev, data.result[0]])
-              }
-            })
+            certificatesFindOneByCertificatesID(dataUsersCertificates[x].certificatesID).then(data => {tempAllCertificates.push(data.result[0])})
+            getImageByCertificatesID(dataUsersCertificates[x].certificatesID).then(data => {
+              const imageBlob = data;
+              const imageUrl = URL.createObjectURL(imageBlob);
+              tempAllImageCertificates.push(imageUrl); 
+            }).catch(error => {
+              tempAllImageCertificates.push('/random.png')
+              console.error('Erreur lors de la récupération de l\'image :', error);
+            });
           }
+          setAllUsersCertificates(tempAllCertificates)
+          setAllUsersImageCertificates(tempAllImageCertificates)
         }
       }, [dataUsersCertificates])
 
       const [imageURL, setImageURL] = useState("/noOne.png");
 
       function getImage(){
-        axios.get(urlUsed + `/foo/get-image/profil/${user.id}`, {
-          responseType: 'blob', // Pour indiquer que la réponse est un fichier binaire (image)
-        })
-        .then(response => {
-          // Créer un objet URL à partir de la réponse Blob
-          const imageBlob = response.data;
+
+        getImageByUserID(user.id).then(data => {
+          const imageBlob = data;
           const imageUrl = URL.createObjectURL(imageBlob);
-          console.log(imageBlob)
-          setImageURL(imageUrl); // Mettre à jour l'URL de l'image
-        })
-        .catch(error => {
+          setImageURL(imageUrl); 
+        }).catch(error => {
           setImageURL('/random.png')
           console.error('Erreur lors de la récupération de l\'image :', error);
         });
@@ -70,6 +77,18 @@ export default function Account() {
       useEffect(() => {
         getImage()
       }, [])
+
+      function getImageCertificates(certificatesID){
+
+        getImageByCertificatesID(certificatesID).then(data => {
+          const imageBlob = data;
+          const imageUrl = URL.createObjectURL(imageBlob);
+          setImageURL(imageUrl); 
+        }).catch(error => {
+          setImageURL('/random.png')
+          console.error('Erreur lors de la récupération de l\'image :', error);
+        });
+      }
        
 
       const [fileImage, setFileImage] = useState(null);
@@ -85,21 +104,7 @@ export default function Account() {
           formData.append('image', fileImage);
           formData.append('id', user.id) // Supposons que vous avez un champ de description dans votre formulaire
 
-          console.log(formData)
-    
-          axios.post(urlUsed+'/foo/uploadImage/profil', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          })
-            .then((response) => {
-              console.log('Image uploaded successfully:', response.data);
-              getImage()
-              // Réinitialisez le formulaire ou effectuez d'autres actions après l'upload
-            })
-            .catch((error) => {
-              console.error('Error uploading image:', error);
-            });
+          uploadProfilPicture(formData).then(data => getImage())
         }
       };
 /* CHECK */
@@ -119,8 +124,6 @@ export default function Account() {
           const formData = new FormData();
           formData.append('video', fileVideo);
           formData.append('description', description); // Supposons que vous avez un champ de description dans votre formulaire
-
-          console.log(formData)
     
           axios.post(urlUsed+'/foo/uploadVideo/cours', formData, {
             headers: {
@@ -168,7 +171,6 @@ export default function Account() {
 
       const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(infosUpdate)
         setCheckRequest(true)
         dispatch(updateUsersInformation(infosUpdate));
       };
@@ -182,7 +184,6 @@ export default function Account() {
 
       const handleSubmitPassword = (e) => {
         e.preventDefault();
-        console.log(infosUpdatePassword)
         setCheckRequest(true)
         dispatch(updateUsersPassword(infosUpdatePassword));
       };
@@ -196,7 +197,7 @@ export default function Account() {
             <div className="profil-container-tab">
               <div className="profil-container-information-all">
                 {imageURL && (
-                        <img className="profil-picture" src={imageURL} alt="Profil Picture" />
+                  <img className="profil-picture" src={imageURL} alt="Profil Picture" />
                 )}
                 <div className="profil-container-information-text-all">
                   <div className="profil-container-information-text">
@@ -327,12 +328,19 @@ export default function Account() {
                       {isActiveCertificates ? <img className="profil-menu-picture" src="/Arrow_down3.svg" alt="Account" /> : <img className="profil-menu-picture" src="/Arrow_right2.svg" alt="Account" />}
                     </div>
                     {isActiveCertificates && <div className="profil-menu-accordion-container">
-                      {allUsersCertificates.map(item => (
-                        <div key={item.id} className="profil-menu-accordion-text-container">
-                          <img className="profil-menu-certificate-picture" src={"/certificate"+item.id+".png"} alt={"certificate"+item.id} />
-                          <span className="profil-menu-accordion-text">{item.title}</span>
-                        </div>
-                      ))}
+                    {allUsersCertificates.map((item, index) => (
+                      <div key={item.id} className="profil-menu-accordion-text-container">
+                        <img
+                          className="profil-menu-certificate-picture"
+                          src={allUsersImageCertificates[index]}
+                          alt={"certificate" + item.id}
+                        />
+                        <span className="profil-menu-accordion-text">
+                          {`Certificate ${index + 1}: ${item.title}`}
+                        </span>
+                      </div>
+                    ))}
+
                     </div>}
                   <span className="profil-divider"></span>
                   

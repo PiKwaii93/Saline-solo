@@ -126,7 +126,7 @@
 .masterclassroom-progress-bar{
     display: flex;
     align-items: flex-start;
-    gap: 3px;
+    gap: 12px;
 }
 
 .masterclassroom-progress-bar-group{
@@ -140,14 +140,14 @@
 }
 
 .masterclassroom-progress-bar-unite{
-    width: 10.83px;
+    width: 12px;
     height: 18px;
     border-bottom: 3px solid rgba(0, 0, 0, 0.25);
     background: #ECECEC;
 }
 
 .masterclassroom-progress-bar-unite-actif{
-    width: 10.83px;
+    width: 12px;
     height: 18px;
     border-bottom: 3px solid rgba(0, 0, 0, 0.25);
     background: #2e7e32;
@@ -213,6 +213,24 @@
     line-height: 24px; /* 171.429% */
 }
 
+.masterclassroom-confirm-container{
+    display: flex;
+    width: 100%;
+    padding: 40px 16px 0px 16px;
+    justify-content: center;
+    align-items: flex-start;
+    
+}
+
+.masterclassroom-confirm-text-container{
+    display: flex;
+    padding: 8px 20px;
+    align-items: center;
+    gap: 4px;
+    border-radius: 4px;
+    border: 1px solid #000;
+    
+}
 
 .masterclassroom-change-page-container{
     display: flex;

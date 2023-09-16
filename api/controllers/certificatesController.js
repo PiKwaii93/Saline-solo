@@ -96,7 +96,6 @@ export function checkUsersCertificates(req, res) {
                 `SELECT * FROM usersCertificates WHERE usersID='${usersID}' && certificatesID='${certificatesID}';`
             )
             .then((result) => {
-                console.log(result)
                 res.status(202).json({
                     result
                 });
@@ -108,7 +107,7 @@ export function checkUsersCertificates(req, res) {
         });
     } 
 
-}
+} 
 
 export function newUsersCertificates(req, res) {
     const { usersID, certificatesID } = req.body;
@@ -119,7 +118,6 @@ export function newUsersCertificates(req, res) {
                 `INSERT INTO usersCertificates (usersID, certificatesID, date) VALUES ('${usersID}', '${certificatesID}', CURDATE())`
             )
             .then((result) => {
-                console.log("meow")
                 res.status(202).json({
                     status: "Success"
                 });
@@ -131,4 +129,31 @@ export function newUsersCertificates(req, res) {
         });
     } 
 
+}
+
+export function createCertificates(req, res) {
+    const { title, masterclassID, role } = req.body;  
+    console.log(title, masterclassID, role )
+
+    if (title, masterclassID && role === "admin") { 
+        try {
+            pool.query(
+                `INSERT INTO certificates (title, masterclassID) VALUES ('${title}', '${masterclassID}')`
+            ).then((result) => {
+                res.status(202).json({
+                    status: "Success"
+                });
+            });
+        } catch (e) {
+            res.status(400).json({
+                status: 'Failed',
+                message: 'Request failed',
+            });
+        } 
+    } else {
+        res.status(400).json({
+            status: 'Failed',
+            message: 'Invalid or missing data in the request',
+        });
+    }
 }

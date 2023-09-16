@@ -1,13 +1,13 @@
 import axios from 'axios';
 import { urlUsed } from '../constantes';
 
-export default function useMasterclassQuizzAll() {
-  return (id) => {
+export default function useFindUserByID() {
+  return (userID) => {
     return axios({
-      url: urlUsed + '/foo/masterclassQuizzAll',
+      url: urlUsed + '/foo/user/findUserByID',
       method: 'post',
       data: {
-        id: id,
+        userID: userID
       },
       headers: { 'Content-Type': 'application/json' },
     })
