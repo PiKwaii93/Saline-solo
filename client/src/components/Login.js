@@ -15,6 +15,8 @@ export default function Login() {
     password: '',
   });
 
+  
+
 
   const handleChange = ({ target }) => {
     setInfosConnexion((prev) => ({
@@ -58,7 +60,7 @@ export default function Login() {
                 className="login-input"
               />
               <input
-                type="text"
+                type="password"
                 name="password"
                 onChange={handleChange}
                 placeholder="Password"

@@ -60,7 +60,7 @@ export default function Register(){
                   className="register-input"
                 />
                 <input
-                  type="text"
+                  type="password"
                   name="password"
                   onChange={handleChange}
                   placeholder="Password"
@@ -69,7 +69,7 @@ export default function Register(){
                   className="register-input"
                 />
                 <input
-                  type="text"
+                  type="password"
                   name="passwordConfirm"
                   onChange={handleChange}
                   placeholder="Confirm Password"

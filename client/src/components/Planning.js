@@ -13,51 +13,41 @@ export default function Planning(){
         infinite: false,
         slidesToShow: 5,
         swipeToSlide: true,
-        afterChange: (index) => {setPreviousIndex(index);handleSlideChange(index)},
       };
     
-      const currentYear = new Date().getFullYear();
-      const currentMonthIndex = new Date().getMonth();
+      const [currentYear, setCurrentYear] = useState(new Date().getFullYear()); // Déclarer currentYear
       const currentMonthNames = [
         "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
         "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
       ];
-      const currentMonthName = currentMonthNames[currentMonthIndex];
       const [selectedDay, setSelectedDay] = useState(null);
-      const [currentMonth, setCurrentMonth] = useState(currentMonthIndex); // Déclarer setCurrentMonth
-
-      const [previousIndex, setPreviousIndex] = useState(0)
-
-      
-        const [tourComplet, setTourComplet] = useState(0);
-        
+      const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
     
-      const handleSlideChange = (index) => {
-        const maxIndex = days.length - 1;
-        console.log(index, previousIndex)
-
-        if(index< previousIndex && index >=0 ){
-            console.log('oyiiiii')
-        }
-    
-        if (index === maxIndex || index === 0) {
-            console.log('iciic')
-          // Le carrousel est revenu au début ou à la fin, changez le mois ici
-          const newMonthIndex = (currentMonthIndex + (index === maxIndex ? 1 : -1)) % 12;
-          setCurrentMonth(newMonthIndex);
-        }
-      };
-    
-      const daysInCurrentMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); // Utiliser currentMonth au lieu de currentMonthIndex
+      const daysInCurrentMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
       const days = Array.from({ length: daysInCurrentMonth }, (_, i) => i + 1);
     
-      const handleDayClick = (day) => { // Déclarer handleDayClick
+      const handleDayClick = (day) => {
         setSelectedDay(day);
-        // Vous pouvez effectuer d'autres actions avec la valeur du jour ici
         console.log("Jour sélectionné :", day);
       };
     
+      const handlePrevMonth = () => {
+        if (currentMonth === 0) {
+          setCurrentMonth(11); // Changer à décembre si le mois actuel est janvier
+          setCurrentYear(currentYear - 1); // Enlever une année
+        } else {
+          setCurrentMonth((prevMonth) => prevMonth - 1);
+        }
+      };
     
+      const handleNextMonth = () => {
+        if (currentMonth === 11) {
+          setCurrentMonth(0); // Changer à janvier si le mois actuel est décembre
+          setCurrentYear(currentYear + 1); // Ajouter une année
+        } else {
+          setCurrentMonth((prevMonth) => prevMonth + 1);
+        }
+      };
 
     return (
       <div className="planning-page-container">
@@ -67,23 +57,25 @@ export default function Planning(){
         <div className="planning-container">
             <div className="planning-calendar-container">
                 <div className="planning-calendar-year-container">
-                    <span className="planning-calendar-year">2023</span>
+                    <span className="planning-calendar-year">{currentYear}</span>
                 </div>
                 <div className="planning-calendar-months-container">
-                    <span className="planning-calendar-months">{currentMonthName}</span>
+                    <button onClick={handlePrevMonth}>Mois précédent</button>
+                    <span className="planning-calendar-months">{currentMonthNames[currentMonth]}</span>
+                    <button onClick={handleNextMonth}>Mois suivant</button>
                 </div>
                 <div>
                     <Slider {...settings}>
                         {days.map((day) => (
-                        <div
+                            <div
                             key={day}
                             className={`planning-calendar-days-one-container ${
-                            day === selectedDay ? "selected" : ""
-                            }`}
+                                day === selectedDay ? "selected" : ""
+                                }`}
                             onClick={() => handleDayClick(day)}
-                        >
+                            >
                             <span className="planning-calendar-one-days">{day}</span>
-                        </div>
+                            </div>
                         ))}
                     </Slider>
                 </div>
