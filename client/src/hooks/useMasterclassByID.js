@@ -1,14 +1,13 @@
 import axios from 'axios';
 import { urlUsed } from '../constantes';
 
-export default function useMasterclassCheckConfirmModule() {
-  return (userID, masterclassID) => {
+export default function useMasterclassByID() {
+  return (masterclassCoursID) => {
     return axios({
-      url: urlUsed + '/foo/masterclassCheckConfirmModule',
+      url: urlUsed + '/foo/masterclassByID',
       method: 'post',
       data: {
-        userID:userID, 
-        masterclassID : masterclassID
+        masterclassCoursID : masterclassCoursID
       },
       headers: { 'Content-Type': 'application/json' },
     })

@@ -89,7 +89,6 @@ export function topicFindOneByAuthor(req, res) {
 export function createTopic(req, res) {
     const { title, categoryID, text, userID } = req.body;
 
-    // Vérification des champs obligatoires
     if (!title || !text || !userID) {
         return res.status(400).json({
             status: 'Failed',
@@ -98,9 +97,8 @@ export function createTopic(req, res) {
     }
 
     try {
-        // Utilisez un placeholder '?' pour categoryID
         const query = 'INSERT INTO forumAllTopic (title, categoryID, text, userID, lastMessageDate) VALUES (?, ?, ?, ?, NOW())';
-        const values = [title, categoryID || null, text, userID]; // Insérer null si categoryID est non défini
+        const values = [title, categoryID || null, text, userID]; 
 
         pool.query(query, values, (error, results) => {
             if (error) {
@@ -114,7 +112,7 @@ export function createTopic(req, res) {
             res.status(202).json({
                 status: 'Success',
                 message: 'Topic créé avec succès.',
-                topicID: results.insertId, // Si vous avez un champ d'ID auto-incrémenté
+                topicID: results.insertId, 
             });
         });
     } catch (e) {
@@ -217,7 +215,6 @@ export function messageFindOneByAuthor(req, res) {
 export function createMessage(req, res) {
     const { topicID, userID, text } = req.body;
   
-    // Vérifier si le champ "text" est vide
     if (!text) {
       return res.status(400).json({
         status: 'Failed',

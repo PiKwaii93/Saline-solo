@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {Link, useLocation} from 'react-router-dom';
 import { slide as Menu } from 'react-burger-menu'
+import HideIfLogged from './HideIfLoggin';
 import HideIfNotLogged from './HideIfNotLogged';
 
 import { useDispatch } from 'react-redux';
@@ -9,6 +10,7 @@ import { disconnect } from '../features/userSlice';
 import { Menu as Menu2, MenuItem, MenuButton } from '@szhsin/react-menu';
 import '@szhsin/react-menu/dist/index.css';
 import '@szhsin/react-menu/dist/transitions/slide.css';
+import HideIfNotAdmin from "./HideIfNotAdmin";
 
 export default function Header(){
   
@@ -63,7 +65,7 @@ export default function Header(){
                         <img src="/Arrow_right.svg" alt="Masterclasses en ligne" className="svg-link"/>
                       </div>
                     </Link>
-                    <Link to="/" className="menu-burger-link-prevent-style">
+                    {/* <Link to="/" className="menu-burger-link-prevent-style">
                       <div className="menu-burger-link-container">
                         <span className="menu-burger-link">Préparez vos compétitions</span>
                         <img src="/Arrow_right.svg" alt="Préparez vos compétitions" className="svg-link"/>
@@ -74,19 +76,19 @@ export default function Header(){
                         <span className="menu-burger-link">On-site academies</span>
                       </div>
                     </Link>
-                    <Link to="/login" className="menu-burger-link-prevent-style">
-                      <div className="menu-burger-link-container">
-                        <span className="menu-burger-link">Connexion</span>
-                      </div>
-                    </Link>
                     <Link to="/" className="menu-burger-link-prevent-style">
                       <div className="menu-burger-link-container">
                         <span className="menu-burger-link">Offres</span>
                       </div>
-                    </Link>
+                    </Link> */}
                     <Link to="/masterclasses" className="menu-burger-link-prevent-style">
                       <div className="menu-burger-link-container">
                         <span className="menu-burger-link">Masterclasses</span>
+                      </div>
+                    </Link>
+                    <Link to="/planning" className="menu-burger-link-prevent-style">
+                      <div className="menu-burger-link-container">
+                        <span className="menu-burger-link">Planning</span>
                       </div>
                     </Link>
                     <Link to="/forum" className="menu-burger-link-prevent-style">
@@ -94,31 +96,41 @@ export default function Header(){
                         <span className="menu-burger-link">Forum</span>
                       </div>
                     </Link>
-                    <Link to="/create-cours" className="menu-burger-link-prevent-style">
-                      <div className="menu-burger-link-container">
-                        <span className="menu-burger-link">Create Cours</span>
-                      </div>
-                    </Link>
-                    <Link to="/create-masterclass" className="menu-burger-link-prevent-style">
-                      <div className="menu-burger-link-container">
-                        <span className="menu-burger-link">Create Masterclass</span>
-                      </div>
-                    </Link>
-                    <Link to="/create-quizz" className="menu-burger-link-prevent-style">
-                      <div className="menu-burger-link-container">
-                        <span className="menu-burger-link">Create Quizz</span>
-                      </div>
-                    </Link>
-                    <Link to="/create-exams" className="menu-burger-link-prevent-style">
-                      <div className="menu-burger-link-container">
-                        <span className="menu-burger-link">Create Exams</span>
-                      </div>
-                    </Link>
+                    <HideIfNotAdmin>
+                      <Link to="/create-cours" className="menu-burger-link-prevent-style">
+                        <div className="menu-burger-link-container">
+                          <span className="menu-burger-link">Create Cours</span>
+                        </div>
+                      </Link>
+                      <Link to="/create-masterclass" className="menu-burger-link-prevent-style">
+                        <div className="menu-burger-link-container">
+                          <span className="menu-burger-link">Create Masterclass</span>
+                        </div>
+                      </Link>
+                      <Link to="/create-quizz" className="menu-burger-link-prevent-style">
+                        <div className="menu-burger-link-container">
+                          <span className="menu-burger-link">Create Quizz</span>
+                        </div>
+                      </Link>
+                      <Link to="/create-exams" className="menu-burger-link-prevent-style">
+                        <div className="menu-burger-link-container">
+                          <span className="menu-burger-link">Create Exams</span>
+                        </div>
+                      </Link>
+                    </HideIfNotAdmin>
                     <HideIfNotLogged>
                       <div className="menu-burger-link-container" onClick={() => dispatch(disconnect())}>
                         <span className="menu-burger-link">Disconnect</span>
                       </div>
                     </HideIfNotLogged>
+                    <HideIfLogged>
+                      <Link to="/login" className="menu-burger-link-prevent-style">
+                        <div className="menu-burger-link-container">
+                          <span className="menu-burger-link">Connexion</span>
+                        </div>
+                      </Link>
+                    </HideIfLogged>
+                    
                   </div>
                   <div className="menu-burger-langue-container" onClick={menuLangueFunction}>
                     <img src="/France.svg" alt="Langue française" className="svg-langue"/>

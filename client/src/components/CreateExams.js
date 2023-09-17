@@ -104,6 +104,7 @@ export default function CreateExams(){
             setCreateExamsInfo({ ...createExamsInfo, page: '' })
             setFileImage(null)
             document.getElementById('fileInput').value = "";
+            document.getElementById('fileInput').value = "";
             certificatesFindOneByMasterclassID(createExamsInfo.masterclassID).then(data=>{if(data.result[0]!=undefined){setCertificatesInfo(data.result[0])}else{setCertificatesInfo({id : "",masterclassID : createExamsInfo.masterclassID,title : "Certificat masterclass " + createExamsInfo.masterclassID})}})
             masterclassesCoursAll(createExamsInfo.masterclassID).then(data=>{
                 let newArrayExamsTemp = []
@@ -354,10 +355,15 @@ export default function CreateExams(){
                         className="create-topic-input"
                         value={idExamsValue}
                     />
-                    <div>
-                        <h2>Upload a Image</h2>
-                        <input type="file" accept="image/*" onChange={handleFileChangeImage} id="fileInput"/>
-                    </div>
+                    <input
+                        type="file"
+                        accept="image/*" 
+                        name="image" 
+                        onChange={handleFileChangeImage} 
+                        id="fileInput"
+                        required
+                        className="create-topic-input"
+                    />
                     
                 </div>
                 {allQuestions.map(item => (

@@ -5,7 +5,7 @@ import { login, register, updateUsersInformation, updateUsersPassword, findUserB
 import multer from 'multer'
 import * as fs from 'fs';
 import path from 'path';
-import { masterclassAll, masterclassCheckConfirmModule, masterclassConfirmModule, masterclassFindOne, masterclasscours, masterclasscoursAll, masterclassQuizzAllByMasterclassID, masterclassExamsAllByMasterclassID, masterclassQuizz, masterclassQuizzQuestion, masterclassExamsAll, masterclassExams, masterclassExamsQuestion, createMasterclass, getLastMasterclass, updateMasterclass, createMasterclassCours, updateMasterclassCours, createMasterclassQuizz, updateMasterclassQuizz, createMasterclassQuizzQuestions, updateMasterclassQuizzQuestions, createMasterclassExams, updateMasterclassExams, createMasterclassExamsQuestions, updateMasterclassExamsQuestions } from '../controllers/masterclassController.js';
+import { masterclassAll, masterclassByID, masterclassCheckConfirmModule, masterclassCheckConfirmModuleFindOne, masterclassCheckConfirmModuleByUserID, masterclassConfirmModule, masterclassFindOne, masterclasscours, masterclasscoursAll, masterclassQuizzAllByMasterclassID, masterclassExamsAllByMasterclassID, masterclassQuizz, masterclassQuizzQuestion, masterclassExamsAll, masterclassExams, masterclassExamsQuestion, createMasterclass, getLastMasterclass, updateMasterclass, createMasterclassCours, updateMasterclassCours, createMasterclassQuizz, updateMasterclassQuizz, createMasterclassQuizzQuestions, updateMasterclassQuizzQuestions, createMasterclassExams, updateMasterclassExams, createMasterclassExamsQuestions, updateMasterclassExamsQuestions } from '../controllers/masterclassController.js';
 import { certificatesAll, certificatesFindOneByMasterclassID, usersCertificates, newUsersCertificates, checkUsersCertificates, certificatesFindOneByCertificatesID, createCertificates } from '../controllers/certificatesController.js';
 import { topicAll, topicFindOneByID, topicFindOneByCategory, topicFindOneByAuthor, createTopic, messageAll, messageFindOneByID, messageFindOneByTopic, messageFindOneByAuthor, createMessage,  categoryAll, categoryFindOneByID } from '../controllers/forumController.js';
 import { getImageByUserID, getImageByMasterclassID, getImageByCertificatesID } from '../controllers/mediaController.js';
@@ -34,6 +34,8 @@ router.post('/user/findUserByID', findUserByID)
 
 router.get("/masterclassAll", masterclassAll)
 
+router.post('/masterclassByID', masterclassByID)
+
 router.post('/masterclassFindOne', masterclassFindOne)
 
 router.post('/masterclasscours', masterclasscours)
@@ -57,6 +59,10 @@ router.post('/masterclassExamsQuestion', masterclassExamsQuestion)
 router.post('/masterclassConfirmModule', masterclassConfirmModule)
 
 router.post('/masterclassCheckConfirmModule', masterclassCheckConfirmModule)
+
+router.post('/masterclassCheckConfirmModuleFindOne', masterclassCheckConfirmModuleFindOne)
+
+router.post('/masterclassCheckConfirmModuleByUserID', masterclassCheckConfirmModuleByUserID)
 
 router.post('/createMasterclass', createMasterclass);
 
@@ -118,9 +124,9 @@ router.post('/forum/messageFindOneByAuthor',messageFindOneByAuthor)
 
 router.post('/forum/createMessage', createMessage)
 
-router.get('/forum/categoryAll', categoryAll)
+router.get('/forum/categoryAll', categoryAll) 
 
-router.post('/forum/categoryFindOneByID', categoryFindOneByID)
+router.post('/forum/categoryFindOneByID', categoryFindOneByID) 
 
 router.post('/media/getImageByUserID', getImageByUserID)
 
@@ -138,9 +144,7 @@ router.get('/get-video/:videoName', (req, res) => {
   const videoName = req.params.videoName;
   const videoPath = path.join(videoDirectory, videoName);
 
-  // Vérifier si le fichier vidéo existe
   if (fs.existsSync(videoPath)) {
-    // Lire le fichier vidéo et le renvoyer en tant que réponse
     const videoStream = fs.createReadStream(videoPath);
     videoStream.pipe(res);
   } else {
@@ -151,7 +155,6 @@ router.get('/get-video/:videoName', (req, res) => {
 
 
 
-// Configuration du stockage des vidéos avec Multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     console.log("LE MULTER DESTINATION")
@@ -165,11 +168,9 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Middleware pour gérer les requêtes POST multipart/form-data
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
 
-// Route pour gérer l'upload de la vidéo et le stockage des métadonnées
 router.post('/uploadVideo/cours', upload.single('video'), async (req, res) => {
   
   console.log('Début du traitement de la requête POST /uploadVideo/cours');
@@ -201,7 +202,6 @@ router.post('/uploadVideo/cours', upload.single('video'), async (req, res) => {
   
 });
 
-// Fonction pour insérer les métadonnées de la vidéo dans la base de données
 async function insertVideoMetadata(filename, description, videoURL) {
   console.log('Insertion des métadonnées de la vidéo dans la base de données');
   let conn;
@@ -245,13 +245,11 @@ const storageImageProfil = multer.diskStorage({
   },
 });
 
-const uploadImageProfil = multer({ storage: storageImageProfil }); // Utilisez directement la configuration dans multer
+const uploadImageProfil = multer({ storage: storageImageProfil }); 
 
-// Middleware pour gérer les requêtes POST multipart/form-data
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
 
-// Route pour gérer l'upload de l'image et le stockage des métadonnées
 router.post('/uploadImage/profil', uploadImageProfil.single('image'), async (req, res) => {
   
   console.log('Début du traitement de la requête POST /uploadImage/profil');
@@ -272,8 +270,8 @@ router.post('/uploadImage/profil', uploadImageProfil.single('image'), async (req
     console.log(extension)
     const imageURL = `/uploadImage/profil/${filename}`;
     
-    const cheminAncienFichier = backAppURL + `/uploadImage/profil/${filename}`; // Chemin complet de l'ancien fichier
-    const cheminNouveauFichier = backAppURL + `/uploadImage/profil/${id}-profilPicture.png`; // Chemin complet du nouveau fichier
+    const cheminAncienFichier = backAppURL + `/uploadImage/profil/${filename}`; 
+    const cheminNouveauFichier = backAppURL + `/uploadImage/profil/${id}-profilPicture.png`; 
 
     fs.rename(cheminAncienFichier, cheminNouveauFichier, (err) => {
       if (err) {
@@ -298,7 +296,6 @@ router.post('/uploadImage/profil', uploadImageProfil.single('image'), async (req
   
 });
 
-// Fonction pour insérer les métadonnées de la vidéo dans la base de données
 async function insertImageProfilMetadata(id, imageURL) {
   console.log('Mise à jour des métadonnées de l\'image dans la base de données');
   let conn;
@@ -336,13 +333,11 @@ const storageImageMasterclass = multer.diskStorage({
   },
 });
 
-const uploadImageMasterclass = multer({ storage: storageImageMasterclass }); // Utilisez directement la configuration dans multer
+const uploadImageMasterclass = multer({ storage: storageImageMasterclass }); 
 
-// Middleware pour gérer les requêtes POST multipart/form-data
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
 
-// Route pour gérer l'upload de l'image et le stockage des métadonnées
 router.post('/uploadImage/masterclass', uploadImageMasterclass.single('image'), async (req, res) => {
   
   console.log('Début du traitement de la requête POST /uploadImage/masterclass');
@@ -364,8 +359,8 @@ router.post('/uploadImage/masterclass', uploadImageMasterclass.single('image'), 
     const imageURL = `/uploadImage/masterclass/${filename}`;
     const newImageURL = `/uploadImage/masterclass/${id}-masterclassPicture.png`
     
-    const cheminAncienFichier = backAppURL + `/uploadImage/masterclass/${filename}`; // Chemin complet de l'ancien fichier
-    const cheminNouveauFichier = backAppURL + `/uploadImage/masterclass/${id}-masterclassPicture.png`; // Chemin complet du nouveau fichier
+    const cheminAncienFichier = backAppURL + `/uploadImage/masterclass/${filename}`; 
+    const cheminNouveauFichier = backAppURL + `/uploadImage/masterclass/${id}-masterclassPicture.png`; 
 
     fs.rename(cheminAncienFichier, cheminNouveauFichier, (err) => {
       if (err) {
@@ -390,7 +385,6 @@ router.post('/uploadImage/masterclass', uploadImageMasterclass.single('image'), 
   
 });
 
-// Fonction pour insérer les métadonnées de la vidéo dans la base de données
 async function insertImageMasterclassMetadata(id, imageURL) {
   console.log('Mise à jour des métadonnées de l\'image dans la base de données');
   let conn;

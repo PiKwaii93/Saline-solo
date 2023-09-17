@@ -14,6 +14,7 @@ import "easymde/dist/easymde.min.css";
 import { SimpleMdeReact } from "react-simplemde-editor";
 import {marked} from 'marked'
 import ReactMarkdown from "react-markdown";
+import useMasterclassCheckConfirmModuleFindOne from "../hooks/useMasterclassCheckConfirmModuleFindOne";
 
 
 
@@ -45,11 +46,14 @@ export default function Masterclassroom() {
 
   const [dataMasterclassExamsAll, setDataMasterclassExamsAll] = useState([])
 
-  const [dataConfirmModule, setDataConfirmMoudle] = useState({
-    masterclassCoursID: "",
-    progress: "",
-    userID: ""
+  const [dataConfirmModule, setDataConfirmMoudle] = useState([])
+
+  const [thisDataConfirmModule, setThisDataConfirmMoudle] = useState({
+    masterclassID:"",
+    progress:"",
+    userID:user.id
   })
+
 
   const handle = useParams()
 
@@ -66,6 +70,8 @@ export default function Masterclassroom() {
   const masterclassConfirmModule = useMasterclassConfirmModule()
 
   const masterclassCheckConfirmModule = useMasterclassCheckConfirmModule()
+  
+  const masterclassCheckConfirmModuleFindOne = useMasterclassCheckConfirmModuleFindOne()
   
   const getImageByMasterclassID = useGetImageByMasterclassID()
 
@@ -98,6 +104,12 @@ export default function Masterclassroom() {
 
 
   useEffect(() => {
+    setCheckNewProgress(false)
+    setThisDataConfirmMoudle({
+      masterclassID:"",
+      progress:"",
+      userID:user.id
+    })
     masterclassFindOne(handle.slug).then(data =>{setdataMasterclassFindOne(data.result[0])})
   }, [handle.page]);
   
@@ -114,74 +126,103 @@ export default function Masterclassroom() {
       masterclassesCoursAll(dataMasterclassFindOne.id).then(data =>{setDataMasterclassCoursAll(data.result)})
       masterclassQuizzAll(dataMasterclassFindOne.id).then(data =>{setDataMasterclassQuizzAll(data.result)})
       masterclassExamsAll(dataMasterclassFindOne.id).then(data =>{setDataMasterclassExamsAll(data.result)})
-      masterclassCheckConfirmModule(user.id, dataMasterclassFindOne.id, handle.page).then(data => {if(data.result[0]!=undefined)setDataConfirmMoudle(data.result[0])})
+      masterclassCheckConfirmModule(user.id, dataMasterclassFindOne.id).then(data => {if(data.result!=undefined)setDataConfirmMoudle(data.result)})
+      masterclassCheckConfirmModuleFindOne(user.id, dataMasterclassFindOne.id, handle.page).then(data => {if(data.result[0]!=undefined)setThisDataConfirmMoudle(data.result[0])})
     }
   }, [dataMasterclassFindOne]);
 
 
 
-
   useEffect(() => {
-    let tempAllPage = []
-    
-    for(let x=0; x<dataMasterclassQuizzAll.length; x++){
-      tempAllPage.push(dataMasterclassQuizzAll[x])
-    }
 
-    for(let x=0; x<dataMasterclassExamsAll.length; x++){
-      tempAllPage.push(dataMasterclassExamsAll[x])
-    }
+    if(dataMasterclassCoursAll.length!=0){
 
-    for(let x=0; x<dataMasterclassCoursAll.length; x++){
-      tempAllPage.push(dataMasterclassCoursAll[x])
-    }
+      let newDataConfirmModule = []
 
-    let tempAllPage2 = []
-
-    for(let x=1; x<=tempAllPage.length; x++){
-      for(let y=0; y<tempAllPage.length; y++){
-        if(tempAllPage[y].page == x && tempAllPage[y].text!="QUIZZ" && tempAllPage[y].text!="EXAMS"){
-          tempAllPage2.push(tempAllPage[y])
+      for(let x=0; x<dataConfirmModule.length; x++){
+        if(dataConfirmModule[x].masterclassID == dataMasterclassFindOne.id){
+          newDataConfirmModule.push(dataConfirmModule[x])
         }
       }
-    }
-    for(let x=0; x<tempAllPage2.length; x++){
-      if(x<handle.page -1){
-        tempUnite+=`<div class="masterclassroom-progress-bar-unite-actif"></div>`
-      }else{       
-        tempUnite+=`<div class="masterclassroom-progress-bar-unite"></div>`
-      }
-      tempBar+=`<div class="masterclassroom-progress-bar-bar"></div>`
 
-      if(tempAllPage2[x].idQuizz!=undefined || tempAllPage2[x].idExams!=undefined){
-        tempUnite+=`</div>`
-        tempBar+=`</div>`
-        progressBarGroup += tempUnite + tempBar + `</div><div class="masterclassroom-progress-bar-group">`
-        tempUnite = `<div class="masterclassroom-progress-bar-group-unite">`
-        tempBar = `<div  class="masterclassroom-progress-bar-group-bar">`
+
+
+
+      let tempAllPage = []
+      
+      for(let x=0; x<dataMasterclassQuizzAll.length; x++){
+        tempAllPage.push(dataMasterclassQuizzAll[x])
       }
 
-      if(x==tempAllPage2.length - 1){
-        progressBarGroup +=  tempUnite + tempBar + `</div>`
+      for(let x=0; x<dataMasterclassExamsAll.length; x++){
+        tempAllPage.push(dataMasterclassExamsAll[x])
       }
+
+      for(let x=0; x<dataMasterclassCoursAll.length; x++){
+        let tempObj = dataMasterclassCoursAll[x]
+        for(let y=0; y<newDataConfirmModule.length; y++){
+          if(newDataConfirmModule[y].progress == dataMasterclassCoursAll[x].page){
+            tempObj.progress = true
+          }
+        }
+        
+        tempAllPage.push(tempObj)
+      }
+
+
+      let tempAllPage2 = []
+
+      for(let x=1; x<=tempAllPage.length; x++){
+        for(let y=0; y<tempAllPage.length; y++){
+          if(tempAllPage[y].page == x && tempAllPage[y].text!="QUIZZ" && tempAllPage[y].text!="EXAMS"){
+            tempAllPage2.push(tempAllPage[y])
+          }
+        }
+      }
+
+
+      for(let x=0; x<tempAllPage2.length; x++){
+        if(tempAllPage2[x].progress == true){
+          tempUnite+=`<div class="masterclassroom-progress-bar-unite-actif"></div>`
+        }else{       
+          tempUnite+=`<div class="masterclassroom-progress-bar-unite"></div>`
+        }
+        tempBar+=`<div class="masterclassroom-progress-bar-bar"></div>`
+
+        if(tempAllPage2[x].idQuizz!=undefined || tempAllPage2[x].idExams!=undefined){
+          tempUnite+=`</div>`
+          tempBar+=`</div>`
+          progressBarGroup += tempUnite + tempBar + `</div><div class="masterclassroom-progress-bar-group">`
+          tempUnite = `<div class="masterclassroom-progress-bar-group-unite">`
+          tempBar = `<div  class="masterclassroom-progress-bar-group-bar">`
+        }
+
+        if(x==tempAllPage2.length - 1){
+          progressBarGroup +=  tempUnite + tempBar + `</div>`
+        }
+      }
+
+      
+      setTempProgress(progressBarGroup)
     }
-
-    
-    setTempProgress(progressBarGroup)
-  }, [dataMasterclassCoursAll]);
+  }, [dataMasterclassCoursAll, dataConfirmModule]);
 
 
 
-/*   useEffect(()=>{
-    if(dataConfirmModule.userID!=""){
-      console.log(dataConfirmModule)
-    }
-  },[dataConfirmModule]) */
+  const [checkNewProgress, setCheckNewProgress] = useState(false)
 
 
   let confirmModule = function confirmModuleFunction() {
-    masterclassConfirmModule(user.id, dataMasterclassFindOne.id, handle.page)
+    console.log(dataMasterclassFindOne)
+    masterclassConfirmModule(user.id, dataMasterclassFindOne.id, handle.page).then(data=>{if(data.status=="Success")setCheckNewProgress(true)})
   }
+
+  useEffect(()=>{
+    if(checkNewProgress==true){
+      masterclassCheckConfirmModule(user.id, dataMasterclassFindOne.id).then(data => {if(data.result!=undefined)setDataConfirmMoudle(data.result)})
+      masterclassCheckConfirmModuleFindOne(user.id, dataMasterclassFindOne.id, handle.page).then(data => {if(data.result[0]!=undefined)setThisDataConfirmMoudle(data.result[0])})
+    }
+  },[checkNewProgress])
 
   
 
@@ -235,7 +276,11 @@ export default function Masterclassroom() {
           <ReactMarkdown className="topic-text" children={dataMasterclassCours.text} />
         </div>
         <div className="masterclassroom-confirm-container">
-          <button className="masterclassroom-confirm-text-container" onClick={confirmModule}>Confirmer le module</button>
+          {thisDataConfirmModule.progress !== "" ? (
+            <button className="masterclassroom-confirm-text-container">Module déjà validé</button>
+          ) : (
+            <button className="masterclassroom-confirm-text-container" onClick={confirmModule}>Confirmer le module</button>
+          )}
         </div>
         <div className="masterclassroom-change-page-container">
           <Link to={linkToPrecedent}  className="masterclassroom-change-page-previous-container">

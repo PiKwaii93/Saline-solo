@@ -10,6 +10,10 @@ import useUploadProfilPicture from "../hooks/useUploadProfilPicture";
 import axios from "axios";
 import { urlUsed } from "../constantes";
 import useGetImageByCertificatesID from "../hooks/useGetImageByCertificatesID";
+import useMasterclassCheckConfirmModuleByUserID from "../hooks/useMasterclassCheckConfirmModuleByUserID";
+import useMasterclassesCoursAll from "../hooks/useMasterclassesCoursAll";
+import useMasterclassByID from "../hooks/useMasterclassByID";
+import { Link } from "react-router-dom";
 
 
 export default function Account() {
@@ -24,6 +28,18 @@ export default function Account() {
 
       const [dataUsersCertificates, setDataUsersCertificates] = useState([])
 
+      const [dataConfirmModule, setDataConfirmModule] = useState([])
+
+      const [dataAllMasterclassCours, setDataAllMasterclassCours] = useState([])
+
+      const [allMasterclassIDCompleted, setAllMasterclassIDCompleted] = useState([])
+
+      const [pourcentageCompletions, setPourcentageCompletions] = useState({});
+
+
+
+
+
       const usersCertificates = useUsersCertificates()
 
       const certificatesFindOneByMasterclassID = useCertificatesFindOneByMasterclassID()
@@ -36,9 +52,76 @@ export default function Account() {
 
       const getImageByUserID = useGetImageByUserID()
 
+      const masterclassCheckConfirmModuleByUserID = useMasterclassCheckConfirmModuleByUserID()
+
+      const masterclassesCoursAll = useMasterclassesCoursAll();
+      
+      const masterclassByID = useMasterclassByID()
+      
+
       useEffect(() => {
         usersCertificates(user.id).then(data => {if(data.result.length!=0)setDataUsersCertificates(data.result)})
+        masterclassCheckConfirmModuleByUserID(user.id).then(data=>{setDataConfirmModule(data.result)})
       },[])
+
+      useEffect(()=>{
+        if(dataConfirmModule.length!=0){
+          let allMasterclassID = []
+          for(let x=0; x<dataConfirmModule.length; x++){
+            if(!allMasterclassID.includes(dataConfirmModule[x].masterclassID)){
+              allMasterclassID.push(dataConfirmModule[x].masterclassID)
+            }
+          }
+          setAllMasterclassIDCompleted(allMasterclassID)
+          const fetchData = () => {
+            const promises = allMasterclassID.map((id) => masterclassesCoursAll(id));
+            Promise.all(promises)
+              .then((results) => {
+                const flattenedData = results.map((data) => data.result)
+                setDataAllMasterclassCours(flattenedData);
+              })
+          };
+      
+          fetchData();
+        }
+      },[dataConfirmModule])
+
+
+      useEffect(() => {
+        if (dataAllMasterclassCours.length !== 0) {
+      
+          let nbrCompletedArray = [];
+          for (let x = 0; x < allMasterclassIDCompleted.length; x++) {
+            let nbrCompleted = 0;
+            for (let y = 0; y < dataConfirmModule.length; y++) {
+              if (dataConfirmModule[y].masterclassID == allMasterclassIDCompleted[x]) {
+                nbrCompleted++;
+              }
+            }
+            nbrCompletedArray.push(nbrCompleted);
+          }
+      
+          let pourcentageArray = [];
+      
+          const fetchAndSetPourcentage = (masterclassID, percentage) => {
+            masterclassByID(masterclassID)
+              .then((data) => {
+                const title = data.result[0].title; 
+                const slug = data.result[0].slug; 
+                pourcentageArray.push({ masterclassID, percentage, title, slug });
+                if (pourcentageArray.length === allMasterclassIDCompleted.length) {
+                  setPourcentageCompletions(pourcentageArray);
+                }
+              })
+          };
+      
+          for (let x = 0; x < nbrCompletedArray.length; x++) {
+            const masterclassID = allMasterclassIDCompleted[x];
+            const percentage = ((nbrCompletedArray[x] / dataAllMasterclassCours[x].length) * 100).toFixed(0);
+            fetchAndSetPourcentage(masterclassID, percentage);
+          }
+        }
+      }, [dataAllMasterclassCours]);
 
       useEffect(() => {
         if(dataUsersCertificates.length!=0){
@@ -77,18 +160,6 @@ export default function Account() {
       useEffect(() => {
         getImage()
       }, [])
-
-      function getImageCertificates(certificatesID){
-
-        getImageByCertificatesID(certificatesID).then(data => {
-          const imageBlob = data;
-          const imageUrl = URL.createObjectURL(imageBlob);
-          setImageURL(imageUrl); 
-        }).catch(error => {
-          setImageURL('/random.png')
-          console.error('Erreur lors de la récupération de l\'image :', error);
-        });
-      }
        
 
       const [fileImage, setFileImage] = useState(null);
@@ -102,12 +173,11 @@ export default function Account() {
         if (fileImage) {
           const formData = new FormData();
           formData.append('image', fileImage);
-          formData.append('id', user.id) // Supposons que vous avez un champ de description dans votre formulaire
+          formData.append('id', user.id) 
 
           uploadProfilPicture(formData).then(data => getImage())
         }
       };
-/* CHECK */
       const [fileVideo, setFileVideo] = useState(null);
       const [description, setDescription] = useState('');
     
@@ -123,7 +193,7 @@ export default function Account() {
         if (fileVideo) {
           const formData = new FormData();
           formData.append('video', fileVideo);
-          formData.append('description', description); // Supposons que vous avez un champ de description dans votre formulaire
+          formData.append('description', description); 
     
           axios.post(urlUsed+'/foo/uploadVideo/cours', formData, {
             headers: {
@@ -132,7 +202,6 @@ export default function Account() {
           })
             .then((response) => {
               console.log('Video uploaded successfully:', response.data);
-              // Réinitialisez le formulaire ou effectuez d'autres actions après l'upload
             })
             .catch((error) => {
               console.error('Error uploading video:', error);
@@ -143,6 +212,8 @@ export default function Account() {
       const [isActiveCertificates, setIsActiveCertificates] = useState(false);
       
       const [isActiveAccount, setIsActiveAccount] = useState(false);
+
+      const [isActiveProgression, setIsActiveProgression] = useState(false);
 
       
 
@@ -206,12 +277,12 @@ export default function Account() {
                   </div>
                   <div>
                     <h2>Upload a Image</h2>
-                    <input type="file" accept="image/*" onChange={handleFileChangeImage} />
+                    <input type="file" accept="image/*" onChange={handleFileChangeImage} className="profil-change-image-input"/>
                     <button onClick={handleUploadImage}>Upload</button>
                   </div>
                 </div>
               </div>
-              <div>
+              {/* <div>
                 <h2>Upload a Video</h2>
                 <input type="file" accept="video/*" onChange={handleFileChangeVideo} />
                 <input
@@ -221,7 +292,7 @@ export default function Account() {
                   onChange={handleDescriptionChangeVideo}
                 />
                 <button onClick={handleUploadVideo}>Upload</button>
-              </div>
+              </div> */}
               <div className="profil-container-menu-all">
                 <div className="profil-container-menu-title">
                   <span className="profil-menu-title">Personal details</span>
@@ -325,7 +396,7 @@ export default function Account() {
                       <div className="profil-menu-text-container">
                         <span className="profil-menu-text">Certificate</span>
                       </div>
-                      {isActiveCertificates ? <img className="profil-menu-picture" src="/Arrow_down3.svg" alt="Account" /> : <img className="profil-menu-picture" src="/Arrow_right2.svg" alt="Account" />}
+                      {isActiveCertificates ? <img className="profil-menu-picture" src="/Arrow_down3.svg" alt="Certificates" /> : <img className="profil-menu-picture" src="/Arrow_right2.svg" alt="Certificates" />}
                     </div>
                     {isActiveCertificates && <div className="profil-menu-accordion-container">
                     {allUsersCertificates.map((item, index) => (
@@ -343,20 +414,26 @@ export default function Account() {
 
                     </div>}
                   <span className="profil-divider"></span>
+
+                  <div className="profil-container-menu"  onClick={() => setIsActiveProgression(!isActiveProgression)}>
+                      <div className="profil-menu-text-container">
+                        <span className="profil-menu-text">Progression</span>
+                      </div>
+                      {isActiveProgression ? <img className="profil-menu-picture" src="/Arrow_down3.svg" alt="Progression" /> : <img className="profil-menu-picture" src="/Arrow_right2.svg" alt="Progression" />}
+                    </div>
+                    {isActiveProgression && <div className="profil-menu-accordion-container">
+                    {pourcentageCompletions.map((item, index) => (
+                      <Link key={index} to={"/masterclassroom/" + item.slug + "/1"}>
+                        <div className="profil-menu-accordion-text-container">
+                          {item.title} : {item.percentage} %
+                        </div>
+                      </Link>
+                      
+                    ))}
+
+                    </div>}
                   
-                  <div className="profil-container-menu">
-                    <div className="profil-menu-text-container">
-                      <span className="profil-menu-text">My progress</span>
-                    </div>
-                    <img className="profil-menu-picture" src="/Arrow_right2.svg" alt="My progress" />
-                  </div>
-                  <span className="profil-divider"></span>
-                  <div className="profil-container-menu">
-                    <div className="profil-menu-text-container">
-                      <span className="profil-menu-text">Planning</span>
-                    </div>
-                    <img className="profil-menu-picture" src="/Arrow_right2.svg" alt="Planning" />
-                  </div>
+                  
                   <span className="profil-divider"></span>
                   <div className="profil-container-menu">
                     <div className="profil-menu-text-container">

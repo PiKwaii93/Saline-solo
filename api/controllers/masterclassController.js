@@ -1,10 +1,32 @@
 import pool from '../config/db.js';
 
 export function masterclassAll(req, res) {
+    try {
+        pool
+            .query(
+                `SELECT * FROM masterclass;`
+            )
+            .then((result) => {
+                res.status(202).json({
+                    result
+                });
+            });
+    } catch (e) {
+        res.status(400).json({
+            status: 'Failed',
+            message: 'Request failed',
+        });
+    } 
+
+}
+
+export function masterclassByID(req, res) {
+    const { masterclassCoursID } = req.body;
+    if (masterclassCoursID) {
         try {
             pool
                 .query(
-                    `SELECT * FROM masterclass;`
+                    `SELECT * FROM masterclass WHERE id='${masterclassCoursID}';`
                 )
                 .then((result) => {
                     res.status(202).json({
@@ -17,7 +39,8 @@ export function masterclassAll(req, res) {
                 message: 'Request failed',
             });
         } 
-    
+    }
+
 }
 
 
@@ -261,12 +284,12 @@ export function masterclassExamsQuestion(req, res) {
 }
 
 export function masterclassConfirmModule(req, res){
-    const {userID, masterclassCoursID, page} = req.body;
-    if (userID, masterclassCoursID, page) {
+    const {userID, masterclassID, page} = req.body;
+    if (userID, masterclassID, page) {
         try {
             pool
                 .query(
-                    `INSERT INTO masterclassCoursProgress (userID, masterclassCoursID, progress) VALUES (${userID}, '${masterclassCoursID}', '${page}');`
+                    `INSERT INTO masterclassCoursProgress (userID, masterclassID, progress) VALUES (${userID}, '${masterclassID}', '${page}');`
                 )
                 .then((result) => {
                     res.status(202).json({
@@ -283,12 +306,57 @@ export function masterclassConfirmModule(req, res){
 }
 
 export function masterclassCheckConfirmModule(req, res){
-    const {userID, masterclassCoursID, page} = req.body;
-    if (userID, masterclassCoursID, page) {
+    const {userID, masterclassID} = req.body;
+    if (userID, masterclassID) {
         try {
             pool
                 .query(
-                    `SELECT * FROM masterclassCoursProgress WHERE masterclassCoursID='${masterclassCoursID}' AND userID='${userID}' AND progress='${page}';`
+                    `SELECT * FROM masterclassCoursProgress WHERE masterclassID='${masterclassID}' AND userID='${userID}';`
+                )
+                .then((result) => {
+                    console.log(result)
+                    res.status(202).json({
+                        result
+                    });
+                });
+        } catch (e) {
+            res.status(400).json({
+                status: 'Failed',
+                message: 'Request failed',
+            });
+        } 
+    }
+}
+
+export function masterclassCheckConfirmModuleFindOne(req, res){
+    const {userID, masterclassID, page} = req.body;
+    if (userID, masterclassID, page ) {
+        try {
+            pool
+                .query(
+                    `SELECT * FROM masterclassCoursProgress WHERE masterclassID='${masterclassID}' AND userID='${userID}' AND progress='${page}';`
+                )
+                .then((result) => {
+                    res.status(202).json({
+                        result
+                    });
+                });
+        } catch (e) {
+            res.status(400).json({
+                status: 'Failed',
+                message: 'Request failed',
+            });
+        } 
+    }
+}
+
+export function masterclassCheckConfirmModuleByUserID(req, res){
+    const {userID} = req.body;
+    if (userID) {
+        try {
+            pool
+                .query(
+                    `SELECT * FROM masterclassCoursProgress WHERE userID='${userID}';`
                 )
                 .then((result) => {
                     res.status(202).json({
@@ -585,27 +653,41 @@ export function updateMasterclassQuizz(req, res) {
     }
 }
 
-export function createMasterclassQuizzQuestions(req, res){
-    const {idQuestion, masterclassQuizzID, question, answer1, answer2, answer3, answer4, correct, role} = req.body;
-    if (idQuestion, masterclassQuizzID, question, answer1, answer2, answer3, answer4, correct && role=="admin") { 
-        try {
-            pool 
-                .query(
-                    `INSERT INTO masterclassQuizzQuestions (idQuestion, masterclassQuizzID, question, answer1, answer2, answer3, answer4, correct) VALUES (${idQuestion},'${masterclassQuizzID}','${question}','${answer1}','${answer2}','${answer3}','${answer4}','${correct}');`
-                )
-                .then((result) => {
-                    res.status(202).json({
-                        status: "Success"
-                    });
-                });
-        } catch (e) {
+export function createMasterclassQuizzQuestions(req, res) {
+    const { idQuestion, masterclassQuizzID, question, answer1, answer2, answer3, answer4, correct, role } = req.body;
+  
+    if (idQuestion && masterclassQuizzID && question && answer1 && answer2 && answer3 && answer4 && correct && role === 'admin') {
+      try {
+        const query = 'INSERT INTO masterclassQuizzQuestions (idQuestion, masterclassQuizzID, question, answer1, answer2, answer3, answer4, correct) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+        const values = [idQuestion, masterclassQuizzID, question, answer1, answer2, answer3, answer4, correct];
+  
+        pool.query(query, values, (error, results) => {
+          if (error) {
+            console.error('Erreur lors de l\'exécution de la requête :', error);
             res.status(400).json({
-                status: 'Failed',
-                message: 'Request failed',
+              status: 'Failed',
+              message: 'La requête a échoué.',
             });
-        } 
+          } else {
+            res.status(202).json({
+              status: 'Success',
+            });
+          }
+        });
+      } catch (e) { 
+        console.error('Erreur lors de la tentative d\'insertion :', e);
+        res.status(400).json({
+          status: 'Failed',
+          message: 'La requête a échoué.',
+        });
+      }
+    } else {
+      res.status(400).json({
+        status: 'Failed',
+        message: 'Les données ne sont pas valides ou le rôle n\'est pas "admin".',
+      });
     }
-}
+  }
 
 export function updateMasterclassQuizzQuestions(req, res) {
     const {questionID, idQuestion, masterclassQuizzID, question, answer1, answer2, answer3, answer4, correct, role } = req.body;

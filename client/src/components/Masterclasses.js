@@ -44,9 +44,6 @@ export default function Masterclasses() {
 
     }, [allMasterclassesTemp]);
 
-    useEffect(()=>{
-      console.log(allMasterclasses)
-    },[allMasterclasses])
 
     const [inputValue, setInputValue] = useState('');
 

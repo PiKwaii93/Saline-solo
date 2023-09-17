@@ -12,6 +12,8 @@ import { useSelector } from 'react-redux';
 import useCheckUsersCertificates from "../hooks/useCheckUsersCertificates";
 import useNewUsersCertificates from "../hooks/useNewUsersCertificates";
 import useGetImageByMasterclassID from "../hooks/useGetImageByMasterclassID";
+import useMasterclassCheckConfirmModule from "../hooks/useMasterclassCheckConfirmModule";
+import useMasterclassConfirmModule from "../hooks/useMasterclassConfirmModule";
 
 
 
@@ -59,6 +61,8 @@ export default function Exams() {
   const [checkerCertificates, setCheckerCertificates] = useState([])
 
   const [checkerRequestCertificates, setCheckerRequestCertificates] = useState(false)
+  
+  const [dataConfirmModule, setDataConfirmMoudle] = useState([])
 
 
   const handle = useParams()
@@ -82,6 +86,10 @@ export default function Exams() {
   const checkUsersCertificates = useCheckUsersCertificates()
 
   const getImageByMasterclassID = useGetImageByMasterclassID()
+
+  const masterclassConfirmModule = useMasterclassConfirmModule()
+  
+  const masterclassCheckConfirmModule = useMasterclassCheckConfirmModule()
 
   
   const [imageURL, setImageURL] = useState("/noOne.png");
@@ -122,6 +130,7 @@ export default function Exams() {
       masterclassExamsAll(dataMasterclassFindOne.id).then(data =>{setDataMasterclassExamsAll(data.result)})
       masterclassQuizzAll(dataMasterclassFindOne.id).then(data =>{setDataMasterclassQuizzAll(data.result)})
       certificatesFindOneByMasterclassID(dataMasterclassFindOne.id).then(data=>{if(data.result[0]!=undefined)setDataCertificatesFindOneByMasterclassID(data.result[0])})
+      masterclassCheckConfirmModule(user.id, dataMasterclassFindOne.id).then(data => {if(data.result!=undefined)setDataConfirmMoudle(data.result)})
     }
   }, [dataMasterclassFindOne]);
 
@@ -221,53 +230,92 @@ export default function Exams() {
  
  
   useEffect(() => {
-    let tempAllPage = []
-    
-    for(let x=0; x<dataMasterclassQuizzAll.length; x++){
-      tempAllPage.push(dataMasterclassQuizzAll[x])
-    }
 
-    for(let x=0; x<dataMasterclassExamsAll.length; x++){
-      tempAllPage.push(dataMasterclassExamsAll[x])
-    }
+    if(dataMasterclassCoursAll.length!=0){
 
-    for(let x=0; x<dataMasterclassCoursAll.length; x++){
-      tempAllPage.push(dataMasterclassCoursAll[x])
-    }
+      let newDataConfirmModule = []
 
-    let tempAllPage2 = []
-
-    for(let x=1; x<=tempAllPage.length; x++){
-      for(let y=0; y<tempAllPage.length; y++){
-        if(tempAllPage[y].page == x && tempAllPage[y].text!="QUIZZ" && tempAllPage[y].text!="EXAMS"){
-          tempAllPage2.push(tempAllPage[y])
+      for(let x=0; x<dataConfirmModule.length; x++){
+        if(dataConfirmModule[x].masterclassID == dataMasterclassFindOne.id){
+          newDataConfirmModule.push(dataConfirmModule[x])
         }
       }
+
+      console.log(newDataConfirmModule)
+
+
+      let tempAllPage = []
+      
+      for(let x=0; x<dataMasterclassQuizzAll.length; x++){
+        tempAllPage.push(dataMasterclassQuizzAll[x])
+      }
+
+      for(let x=0; x<dataMasterclassExamsAll.length; x++){
+        tempAllPage.push(dataMasterclassExamsAll[x])
+      }
+
+      for(let x=0; x<dataMasterclassCoursAll.length; x++){
+        let tempObj = dataMasterclassCoursAll[x]
+        for(let y=0; y<newDataConfirmModule.length; y++){
+          if(newDataConfirmModule[y].progress == dataMasterclassCoursAll[x].page){
+            tempObj.progress = true
+          }
+        }
+        
+        tempAllPage.push(tempObj)
+      }
+
+
+      let tempAllPage2 = []
+
+      for(let x=1; x<=tempAllPage.length; x++){
+        for(let y=0; y<tempAllPage.length; y++){
+          if(tempAllPage[y].page == x && tempAllPage[y].text!="QUIZZ" && tempAllPage[y].text!="EXAMS"){
+            tempAllPage2.push(tempAllPage[y])
+          }
+        }
+      }
+
+      console.log(tempAllPage2)
+
+      for(let x=0; x<tempAllPage2.length; x++){
+        if(tempAllPage2[x].progress == true){
+          tempUnite+=`<div class="masterclassroom-progress-bar-unite-actif"></div>`
+        }else{       
+          tempUnite+=`<div class="masterclassroom-progress-bar-unite"></div>`
+        }
+        tempBar+=`<div class="masterclassroom-progress-bar-bar"></div>`
+
+        if(tempAllPage2[x].idQuizz!=undefined || tempAllPage2[x].idExams!=undefined){
+          tempUnite+=`</div>`
+          tempBar+=`</div>`
+          progressBarGroup += tempUnite + tempBar + `</div><div class="masterclassroom-progress-bar-group">`
+          tempUnite = `<div class="masterclassroom-progress-bar-group-unite">`
+          tempBar = `<div  class="masterclassroom-progress-bar-group-bar">`
+        }
+
+        if(x==tempAllPage2.length - 1){
+          progressBarGroup +=  tempUnite + tempBar + `</div>`
+        }
+      }
+
+      
+      setTempProgress(progressBarGroup)
     }
-    for(let x=0; x<tempAllPage2.length; x++){
-      if(x<handle.page -1){
-        tempUnite+=`<div class="masterclassroom-progress-bar-unite-actif"></div>`
-      }else{       
-        tempUnite+=`<div class="masterclassroom-progress-bar-unite"></div>`
-      }
-      tempBar+=`<div class="masterclassroom-progress-bar-bar"></div>`
+  }, [dataMasterclassCoursAll, dataConfirmModule]);
 
-      if(tempAllPage2[x].idQuizz!=undefined || tempAllPage2[x].idExams!=undefined){
-        tempUnite+=`</div>`
-        tempBar+=`</div>`
-        progressBarGroup += tempUnite + tempBar + `</div><div class="masterclassroom-progress-bar-group">`
-        tempUnite = `<div class="masterclassroom-progress-bar-group-unite">`
-        tempBar = `<div  class="masterclassroom-progress-bar-group-bar">`
-      }
+  const [checkNewProgress, setCheckNewProgress] = useState(false)
 
-      if(x==tempAllPage2.length - 1){
-        progressBarGroup +=  tempUnite + tempBar + `</div>`
-      }
+
+  let confirmModule = function confirmModuleFunction() {
+    masterclassConfirmModule(user.id, dataMasterclassFindOne.id, handle.page).then(data=>{if(data.status=="Success")setCheckNewProgress(true)})
+  }
+
+  useEffect(()=>{
+    if(checkNewProgress==true){
+      masterclassCheckConfirmModule(user.id, dataMasterclassFindOne.id).then(data => {if(data.result!=undefined)setDataConfirmMoudle(data.result)})
     }
-
-    
-    setTempProgress(progressBarGroup)
-  }, [dataMasterclassCoursAll]);
+  },[checkNewProgress])
 
   
 

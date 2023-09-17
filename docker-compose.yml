@@ -16,6 +16,7 @@ services:
       - /uploadVideo/cours:/app/uploadVideo/cours
       - /uploadImage/profil:/app/uploadImage/profil
       - /uploadImage/masterclass:/app/uploadImage/masterclass
+      - /uploadImage/certificates:/app/uploadImage/certificates
       
 
   client:

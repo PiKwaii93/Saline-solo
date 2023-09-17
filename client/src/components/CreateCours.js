@@ -144,12 +144,9 @@ export default function CreateCours(){
             if(allMasterclassCoursTemp[x].page == createCoursInfo.page){
                 coursIDTemp = allMasterclassCoursTemp[x].id
                 checkPageExistente=true
-            }else{
-                console.log('nouvelle page')
             }
         }
       }
-      console.log(checkPageExistente)
       if(checkPageExistente==true){
         //Update
         updateMasterclassCours(createCoursInfo, coursIDTemp).then(data=>{if(data.status=="Success"){setCheckSuccess(true)}})

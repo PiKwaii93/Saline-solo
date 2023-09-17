@@ -73,7 +73,6 @@ export default function CreateMasterclass(){
 
 
     useEffect(() => {
-        console.log(checkCreateMasterclass)
         if(checkCreateMasterclass==true){
             console.log(checkCreateMasterclass)
             getLastMasterclass().then(data => setDataLastMasterclass(data.result[0]))
@@ -160,6 +159,7 @@ export default function CreateMasterclass(){
                     onChange={handleFileChangeImage}
                     required
                     className="create-topic-input"
+                    id = "fileInput"
                 />
                 </div>
                 <button className="login-button" type="submit">

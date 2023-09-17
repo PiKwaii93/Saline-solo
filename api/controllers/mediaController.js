@@ -18,7 +18,6 @@ export function getImageByUserID(req, res){
         const imageName = userID + "-profilPicture.png";
         const imagePath = path.join(profilImageDirectory, imageName);
         if (fs.existsSync(imagePath)) {
-            // Lire le fichier image et le renvoyer en tant que réponse
             const imageStream = fs.createReadStream(imagePath);
             imageStream.pipe(res);
           } else {
@@ -34,7 +33,6 @@ export function getImageByMasterclassID(req, res){
         const imageName = masterclassID + "-masterclassPicture.png";
         const imagePath = path.join(masterclassImageDirectory, imageName);
         if (fs.existsSync(imagePath)) {
-            // Lire le fichier image et le renvoyer en tant que réponse
             const imageStream = fs.createReadStream(imagePath);
             imageStream.pipe(res);
           } else {
@@ -46,12 +44,10 @@ export function getImageByMasterclassID(req, res){
 
 export function getImageByCertificatesID(req, res){
     const {certificatesID} = req.body;
-    console.log(certificatesID)
     if (certificatesID) {
         const imageName = certificatesID + "-certificates.png";
         const imagePath = path.join(certificatesImageDirectory, imageName);
         if (fs.existsSync(imagePath)) {
-            // Lire le fichier image et le renvoyer en tant que réponse
             const imageStream = fs.createReadStream(imagePath);
             imageStream.pipe(res);
           } else {

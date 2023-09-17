@@ -2,18 +2,17 @@ import React, { Fragment } from "react";
 import axios from "axios";
 import "./App.scss";
 import {Routes, Route, Navigate} from 'react-router-dom';
-import Layout from "./components/Layout";
+import HideIfLogged from './components/HideIfLoggin';
+import HideIfNotLogged from './components/HideIfNotLogged';
+import HideIfNotAdmin from "./components/HideIfNotAdmin";
+
 import Home from "./components/Home";
-import Blogs from "./components/Blogs";
-import Contact from "./components/Contact";
 import NoPage from "./components/NoPage";
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Header2 from "./components/Header2";
 import Login from "./components/Login";
 import Register from "./components/Register";
-import HideIfLogged from './components/HideIfLoggin';
-import HideIfNotLogged from './components/HideIfNotLogged';
 import Account from "./components/Account";
 import Masterclasses from "./components/Masterclasses";
 import Masterclassroom from "./components/Masterclassroom";
@@ -28,6 +27,11 @@ import CreateCours from "./components/CreateCours";
 import CreateMasterclass from "./components/CreateMasterclass";
 import CreateQuizz from "./components/CreateQuizz";
 import CreateExams from "./components/CreateExams";
+import VideoUploadForm from "./components/UploadVideo";
+import Planning from "./components/Planning";
+import { useSelector } from "react-redux";
+
+
 export default function App() {
 
 
@@ -44,10 +48,7 @@ export default function App() {
                     </HideIfLogged>
                     <HideIfNotLogged>
                       <Routes>
-                        <Route path="/" element={<Layout />}>
                           <Route index element={<Home />} />
-                          <Route path="blogs" element={<Blogs />} />
-                          <Route path="contact" element={<Contact />} />
                           <Route path="/login" element={<Navigate to="/" />} />
                           <Route path="/register" element={<Navigate to="/" />} />
                           <Route path="/account" element={<Account/>} />
@@ -59,12 +60,13 @@ export default function App() {
                           <Route path="/forum" element={<Forum/>}/>
                           <Route path="/create-topic" element={<CreateTopic/>}/>
                           <Route path="/topic/:idTopic" element={<Topic/>}/>
+                          <Route path="/video-upload" element={<VideoUploadForm/>}/>
+                          <Route path="/planning" element={<Planning/>}/>
                           <Route path="/create-cours" element={<CreateCours/>}/>
                           <Route path="/create-masterclass" element={<CreateMasterclass/>}/>
                           <Route path="/create-quizz" element={<CreateQuizz/>}/>
                           <Route path="/create-exams" element={<CreateExams/>}/>
                           <Route path="*" element={<NoPage />} />
-                        </Route>
                       </Routes>
                     </HideIfNotLogged>
                     {/* <button onClick={deploy1}>Deploy</button>

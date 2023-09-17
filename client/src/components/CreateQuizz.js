@@ -129,11 +129,16 @@ export default function CreateQuizz(){
         if(allMasterclassQuizzTemp.length!=0){
             masterclassQuizzAllByID(createQuizzInfo.masterclassID).then(data=>{
                 let newArrayTemp = []
-                for(let x=0; x<data.result.length; x++){
-                    newArrayTemp.push(data.result[x])
-                    if(x==data.result.length-1){
-                        newArrayTemp.push({id : "", idQuizz : "", masterclassID : newArrayTemp[newArrayTemp.length - 1].masterclassID, page : allMasterclassQuizzTemp[allMasterclassQuizzTemp.length -1].page, slug : "", title : ""})
+
+                if(data.result.length>0){
+                    for(let x=0; x<data.result.length; x++){
+                        newArrayTemp.push(data.result[x])
+                        if(x==data.result.length-1){
+                            newArrayTemp.push({id : "", idQuizz : "", masterclassID : newArrayTemp[newArrayTemp.length - 1].masterclassID, page : allMasterclassQuizzTemp[allMasterclassQuizzTemp.length -1].page, slug : "", title : ""})
+                        }
                     }
+                }else{
+                    newArrayTemp.push({id : "", idQuizz : "", masterclassID : allMasterclassQuizzTemp[0].masterclassID, page : allMasterclassQuizzTemp[0].page, slug : "", title : ""})
                 }
                 setAllMasterclassQuizz(newArrayTemp)
             })
@@ -163,11 +168,6 @@ export default function CreateQuizz(){
         }
     },[createQuizzInfo.page, checkSuccess])
 
-/*     useEffect(()=>{
-        if(allQuestions.length!=0){
-            console.log(allQuestions)
-        }
-    },[allQuestions]) */
 
     
     const handleChangeQuizz = ({ target }) => {
