@@ -9,6 +9,7 @@ import { masterclassAll, masterclassByID, masterclassCheckConfirmModule, masterc
 import { certificatesAll, certificatesFindOneByMasterclassID, usersCertificates, newUsersCertificates, checkUsersCertificates, certificatesFindOneByCertificatesID, createCertificates } from '../controllers/certificatesController.js';
 import { topicAll, topicFindOneByID, topicFindOneByCategory, topicFindOneByAuthor, createTopic, messageAll, messageFindOneByID, messageFindOneByTopic, messageFindOneByAuthor, createMessage,  categoryAll, categoryFindOneByID } from '../controllers/forumController.js';
 import { getImageByUserID, getImageByMasterclassID, getImageByCertificatesID } from '../controllers/mediaController.js';
+import { planningByDate } from '../controllers/planningController.js';
 
 const router = express.Router();
 
@@ -133,6 +134,8 @@ router.post('/media/getImageByUserID', getImageByUserID)
 router.post('/media/getImageByMasterclassID', getImageByMasterclassID)
 
 router.post('/media/getImageByCertificatesID', getImageByCertificatesID)
+
+router.post('/planning/planningByDate', planningByDate)
 
 const backAppURL = "./app"
 /* const backAppURL = "/app" */

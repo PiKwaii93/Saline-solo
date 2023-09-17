@@ -9,7 +9,7 @@ export default function useGetImageByUserID() {
         data: {
           userID: userID
         },
-        responseType: 'blob', // Définissez responseType sur 'blob' pour obtenir une réponse de type Blob
+        responseType: 'blob', 
       })
         .then((res) => {
           const blob = new Blob([res.data], { type: res.headers['content-type'] });
