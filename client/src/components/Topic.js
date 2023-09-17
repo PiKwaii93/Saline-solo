@@ -11,6 +11,7 @@ import "easymde/dist/easymde.min.css";
 import { SimpleMdeReact } from "react-simplemde-editor";
 import {marked} from 'marked'
 import ReactMarkdown from "react-markdown";
+import HideIfNotLogged from "./HideIfNotLogged";
 
 export default function Topic(){
 
@@ -115,16 +116,13 @@ export default function Topic(){
       
             await Promise.all(
               allUsersTemp.map(async (user) => {
-                console.log(user)
                 const data = await getImageByUserID(user.id);
                 const imageBlob = data;
                 const imageUrl = URL.createObjectURL(imageBlob);
-                console.log(imageUrl)
                 user.image = imageUrl;
                 newArray.push(user);
               })
             );
-            console.log(newArray)
             setAllUsers(newArray);
           };
       
@@ -145,8 +143,7 @@ export default function Topic(){
       
       const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(createMessageInfo)
-        createMessage(createMessageInfo).then(data=>{console.log(data); if(data.status == "Success")setTriggerEffect(true)})
+        createMessage(createMessageInfo).then(data=>{if(data.status == "Success")setTriggerEffect(true)})
       };
 
 
@@ -240,28 +237,30 @@ export default function Topic(){
 
                 </div>
             </div>
-            <form
-                noValidate
-                onSubmit={handleSubmit}
-                className="create-topic-form-container"
-            >
-                <h5>Vous souahitez répondre ? Ecrivez votre avis ici :</h5>
-                <div className="create-topic-input-container-all">
-                    <SimpleMdeReact
-                        type="text"
-                        name="text"
-                        onChange={(value) => handleEditorChange("text", value)}
-                        placeholder="Text"
-                        required
-                        minLength={1}
-                        className="create-topic-input-textarea"
-                        options={options} // Utilisez les options ici
-                    />
-                </div>
-                <button className="login-button" type="submit">
-                    Confirmer
-                </button>
-            </form>
+            <HideIfNotLogged>
+                <form
+                    noValidate
+                    onSubmit={handleSubmit}
+                    className="create-topic-form-container"
+                >
+                    <h5>Vous souahitez répondre ? Ecrivez votre avis ici :</h5>
+                    <div className="create-topic-input-container-all">
+                        <SimpleMdeReact
+                            type="text"
+                            name="text"
+                            onChange={(value) => handleEditorChange("text", value)}
+                            placeholder="Text"
+                            required
+                            minLength={1}
+                            className="create-topic-input-textarea"
+                            options={options} // Utilisez les options ici
+                        />
+                    </div>
+                    <button className="login-button" type="submit">
+                        Confirmer
+                    </button>
+                </form>
+            </HideIfNotLogged>
         </div>
     );
 }

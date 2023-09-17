@@ -4,7 +4,8 @@ export default function HideIfNotAdmin({ children }) {
   const user = useSelector((state) => state.user);
 
   if (user.role!="admin") {
-    return <></>;
+    return null;
+  }else{
+    return children;
   }
-  return children;
 }

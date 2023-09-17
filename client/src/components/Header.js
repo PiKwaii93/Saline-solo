@@ -86,16 +86,18 @@ export default function Header(){
                         <span className="menu-burger-link">Masterclasses</span>
                       </div>
                     </Link>
-                    <Link to="/planning" className="menu-burger-link-prevent-style">
-                      <div className="menu-burger-link-container">
-                        <span className="menu-burger-link">Planning</span>
-                      </div>
-                    </Link>
                     <Link to="/forum" className="menu-burger-link-prevent-style">
                       <div className="menu-burger-link-container">
                         <span className="menu-burger-link">Forum</span>
                       </div>
                     </Link>
+                    <HideIfNotLogged>
+                      <Link to="/planning" className="menu-burger-link-prevent-style">
+                        <div className="menu-burger-link-container">
+                          <span className="menu-burger-link">Planning</span>
+                        </div>
+                      </Link>
+                    </HideIfNotLogged>
                     <HideIfNotAdmin>
                       <Link to="/create-cours" className="menu-burger-link-prevent-style">
                         <div className="menu-burger-link-container">

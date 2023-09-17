@@ -13,6 +13,8 @@ import useGetImageByCertificatesID from "../hooks/useGetImageByCertificatesID";
 import useMasterclassCheckConfirmModuleByUserID from "../hooks/useMasterclassCheckConfirmModuleByUserID";
 import useMasterclassesCoursAll from "../hooks/useMasterclassesCoursAll";
 import useMasterclassByID from "../hooks/useMasterclassByID";
+import useUserEventByUserID from "../hooks/useUserEventByUserID";
+import usePlanningByID from "../hooks/usePlanningByID";
 import { Link } from "react-router-dom";
 
 
@@ -36,6 +38,9 @@ export default function Account() {
 
       const [pourcentageCompletions, setPourcentageCompletions] = useState({});
 
+      const [dataUserEvent, setDataUserEvent] = useState([])
+
+      const [dataUserEventInfo, setDataUserEventInfo] = useState([])
 
 
 
@@ -57,12 +62,33 @@ export default function Account() {
       const masterclassesCoursAll = useMasterclassesCoursAll();
       
       const masterclassByID = useMasterclassByID()
+
+      const planningByUserID = useUserEventByUserID()
+
+      const planningByID = usePlanningByID()
       
 
       useEffect(() => {
         usersCertificates(user.id).then(data => {if(data.result.length!=0)setDataUsersCertificates(data.result)})
         masterclassCheckConfirmModuleByUserID(user.id).then(data=>{setDataConfirmModule(data.result)})
+        planningByUserID(user.id).then(data=>{setDataUserEvent(data.result)})
       },[])
+
+      useEffect(()=>{
+        if(dataUserEvent.length!=0){
+          console.log(dataUserEvent)
+          const fetchData = () => {
+            const promises = dataUserEvent.map((item) => planningByID(item.planningEventID));
+            Promise.all(promises)
+              .then((results) => {
+                const flattenedData = results.map((data) => data.result).flat()
+                setDataUserEventInfo(flattenedData);
+              })
+          };
+      
+          fetchData();
+        }
+      },[dataUserEvent])
 
       useEffect(()=>{
         if(dataConfirmModule.length!=0){
@@ -214,6 +240,8 @@ export default function Account() {
       const [isActiveAccount, setIsActiveAccount] = useState(false);
 
       const [isActiveProgression, setIsActiveProgression] = useState(false);
+
+      const [isActiveEvent, setIsActiveEvent] = useState(false);
 
       
 
@@ -421,27 +449,42 @@ export default function Account() {
                       </div>
                       {isActiveProgression ? <img className="profil-menu-picture" src="/Arrow_down3.svg" alt="Progression" /> : <img className="profil-menu-picture" src="/Arrow_right2.svg" alt="Progression" />}
                     </div>
-                    {isActiveProgression && <div className="profil-menu-accordion-container">
-                    {pourcentageCompletions.map((item, index) => (
-                      <Link key={index} to={"/masterclassroom/" + item.slug + "/1"}>
-                        <div className="profil-menu-accordion-text-container">
-                          {item.title} : {item.percentage} %
-                        </div>
-                      </Link>
-                      
-                    ))}
+                    {isActiveProgression && 
+                      <div className="profil-menu-accordion-container">
+                      {pourcentageCompletions.map((item, index) => (
+                        <Link key={index} to={"/masterclassroom/" + item.slug + "/1"}>
+                          <div className="profil-menu-accordion-text-container">
+                            {item.title} : {item.percentage} %
+                          </div>
+                        </Link>
+                        
+                      ))}
 
-                    </div>}
+                      </div>
+                    }
                   
                   
                   <span className="profil-divider"></span>
-                  <div className="profil-container-menu">
-                    <div className="profil-menu-text-container">
-                      <span className="profil-menu-text">Upcoming test</span>
+
+                  <div className="profil-container-menu"  onClick={() => setIsActiveEvent(!isActiveEvent)}>
+                      <div className="profil-menu-text-container">
+                        <span className="profil-menu-text">Evènements</span>
+                      </div>
+                      {isActiveEvent ? <img className="profil-menu-picture" src="/Arrow_down3.svg" alt="Progression" /> : <img className="profil-menu-picture" src="/Arrow_right2.svg" alt="Progression" />}
                     </div>
-                    <img className="profil-menu-picture" src="/Arrow_right2.svg" alt="Upcoming test" />
-                  </div>
-                  <span className="profil-divider"></span>
+                    {isActiveEvent && 
+                      <div className="profil-menu-accordion-container">
+                      {dataUserEventInfo.map((item, index) => (
+                        <div key={index} className="profil-menu-accordion-text-container">
+                           <span className="profil-menu-accordion-text">{item.title}</span>
+                           <span className="profil-menu-accordion-text">{new Date(item.start).getHours()}:{new Date(item.start).getMinutes()}- {new Date(item.end).getHours()}:{new Date(item.end).getMinutes()}</span>
+                        </div>
+                        
+                      ))}
+
+                      </div>
+                    }
+                    <span className="profil-divider"></span>
                 </div>
               </div>
             </div>
