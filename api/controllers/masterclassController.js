@@ -113,6 +113,27 @@ export function masterclasscoursAll(req, res) {
     
 }
 
+
+export function getMasterclassExxamsAll(req, res) {
+  try {
+      pool
+          .query(
+              `SELECT * FROM masterclassExams;`
+          )
+          .then((result) => {
+              res.status(202).json({
+                  result
+              });
+          });
+  } catch (e) {
+      res.status(400).json({
+          status: 'Failed',
+          message: 'Request failed',
+      });
+  } 
+  
+}
+
 export function masterclassExamsAllByMasterclassID(req, res) {
     const { id } = req.body;
     if (id) {
@@ -314,7 +335,6 @@ export function masterclassCheckConfirmModule(req, res){
                     `SELECT * FROM masterclassCoursProgress WHERE masterclassID='${masterclassID}' AND userID='${userID}';`
                 )
                 .then((result) => {
-                    console.log(result)
                     res.status(202).json({
                         result
                     });
@@ -375,38 +395,39 @@ export function masterclassCheckConfirmModuleByUserID(req, res){
 export function createMasterclass(req, res) {
     const { title, time, difficulty, role } = req.body;
     const slug = title.toLowerCase().replaceAll(' ', '_');
-
+  
     if (title && slug && time && difficulty && role === "admin") {
-        try {
-            const formattedTime = time + 'h'; 
-
-            pool.query(
-                `INSERT INTO masterclass (title, slug, time, difficulty) VALUES ('${title}', '${slug}', '${formattedTime}', '${difficulty}')`
-            ).then((result) => {
-                res.status(202).json({
-                    status: "Success"
-                });
-            });
-        } catch (e) {
-            res.status(400).json({
-                status: 'Failed',
-                message: 'Request failed',
-            });
-        } 
-    } else {
-        res.status(400).json({
-            status: 'Failed',
-            message: 'Invalid or missing data in the request',
+      try {
+        const formattedTime = time + 'h';
+  
+        pool.query(
+          `INSERT INTO masterclass (title, slug, time, difficulty) VALUES (?, ?, ?, ?)`,
+          [title, slug, formattedTime, difficulty]
+        ).then((result) => {
+          res.status(202).json({
+            status: "Success"
+          });
         });
+      } catch (e) {
+        res.status(400).json({
+          status: 'Failed',
+          message: 'Request failed',
+        });
+      }
+    } else {
+      res.status(400).json({
+        status: 'Failed',
+        message: 'Invalid or missing data in the request',
+      });
     }
-}
+  }
+  
 
 export function getLastMasterclass(req, res) {
     try {
         pool.query(
             'SELECT * FROM masterclass ORDER BY id DESC LIMIT 1;'
         ).then((result) => {
-            console.log(result)
             if (result.length > 0) {
                 res.status(202).json({
                     result : result
@@ -427,65 +448,70 @@ export function getLastMasterclass(req, res) {
 }
 
 
-
-
 export function updateMasterclass(req, res) {
     const { masterclassId, title, image, time, difficulty, role } = req.body;
     const slug = title.toLowerCase().replaceAll(' ', '_');
-
-    if (masterclassId) {
-        try {
-            let updateQuery = "UPDATE masterclass SET ";
-            let updateFields = [];
-
-            if (title !== "") {
-                updateFields.push(`title = '${title}'`);
-            }
-
-            if (slug !== "") {
-                updateFields.push(`slug = '${slug}'`);
-            }
-
-            if (image !== "") {
-                updateFields.push(`image = '${image}'`);
-            }
-
-            if (time !== "") {
-                updateFields.push(`time = '${time}'`);
-            }
-
-            if (difficulty !== "") {
-                updateFields.push(`difficulty = '${difficulty}'`);
-            }
-
-            if (updateFields.length > 0) {
-                updateQuery += updateFields.join(", ") + ` WHERE id = ${masterclassId};`;
-
-                pool.query(updateQuery).then((result) => {
-                    res.status(200).json({
-                        status: "Success",
-                        message: "Masterclass updated successfully"
-                    });
-                });
-            } else {
-                res.status(200).json({
-                    status: "Success",
-                    message: "No fields to update"
-                });
-            }
-        } catch (e) {
-            res.status(400).json({
-                status: 'Failed',
-                message: 'Request failed',
-            });
+  
+    if (masterclassId && role === "admin") {
+      try {
+        let updateQuery = "UPDATE masterclass SET ";
+        let updateFields = [];
+        let updateValues = [];
+  
+        if (title !== "") {
+          updateFields.push(`title = ?`);
+          updateValues.push(title);
         }
-    } else {
+  
+        if (slug !== "") {
+          updateFields.push(`slug = ?`);
+          updateValues.push(slug);
+        }
+  
+        if (image !== "") {
+          updateFields.push(`image = ?`);
+          updateValues.push(image);
+        }
+  
+        if (time !== "") {
+          updateFields.push(`time = ?`);
+          updateValues.push(time);
+        }
+  
+        if (difficulty !== "") {
+          updateFields.push(`difficulty = ?`);
+          updateValues.push(difficulty);
+        }
+  
+        if (updateFields.length > 0) {
+          updateQuery += updateFields.join(", ") + ` WHERE id = ?;`;
+          updateValues.push(masterclassId);
+  
+          pool.query(updateQuery, updateValues).then((result) => {
+            res.status(200).json({
+              status: "Success",
+              message: "Masterclass updated successfully"
+            });
+          });
+        } else {
+          res.status(200).json({
+            status: "Success",
+            message: "No fields to update"
+          });
+        }
+      } catch (e) {
         res.status(400).json({
-            status: 'Failed',
-            message: 'Invalid masterclass ID provided',
+          status: 'Failed',
+          message: 'Request failed',
         });
+      }
+    } else {
+      res.status(400).json({
+        status: 'Failed',
+        message: 'Invalid masterclass ID or role provided',
+      });
     }
-}
+  }
 
 export function createMasterclassCours(req, res) {
     const { text, page, masterclassID, role } = req.body;
@@ -515,145 +541,159 @@ export function createMasterclassCours(req, res) {
     }
 }
 
-
 export function updateMasterclassCours(req, res) {
     const { coursID, text, page, masterclassID, role } = req.body;
-
-    if (coursID && role=="admin") {
-        try {
-            let updateQuery = "UPDATE masterclassCours SET ";
-            let updateFields = [];
-
-            if (text !== "") {
-                updateFields.push(`text = '${text}'`);
-            }
-
-            if (page !== "") {
-                updateFields.push(`page = '${page}'`);
-            }
-
-            if (masterclassID !== "") {
-                updateFields.push(`masterclassID = '${masterclassID}'`);
-            }
-
-            if (updateFields.length > 0) {
-                updateQuery += updateFields.join(", ") + ` WHERE id = ${coursID};`;
-
-                pool.query(updateQuery).then((result) => {
-                    res.status(200).json({
-                        status: "Success",
-                        message: "MasterclassCours updated successfully"
-                    });
-                });
-            } else {
-                res.status(200).json({
-                    status: "Success",
-                    message: "No fields to update"
-                });
-            }
-        } catch (e) {
-            res.status(400).json({
-                status: 'Failed',
-                message: 'Request failed',
-            });
+  
+    if (coursID && role === "admin") {
+      try {
+        let updateQuery = "UPDATE masterclassCours SET ";
+        let updateFields = [];
+        let values = [];
+  
+        if (text !== "") {
+          updateFields.push("text = ?");
+          values.push(text);
         }
-    } else {
+  
+        if (page !== "") {
+          updateFields.push("page = ?");
+          values.push(page);
+        }
+  
+        if (masterclassID !== "") {
+          updateFields.push("masterclassID = ?");
+          values.push(masterclassID);
+        }
+  
+        if (updateFields.length > 0) {
+          values.push(coursID);
+          updateQuery += updateFields.join(", ") + " WHERE id = ?";
+  
+          pool.query(updateQuery, values).then((result) => {
+            res.status(200).json({
+              status: "Success",
+              message: "MasterclassCours updated successfully",
+            });
+          });
+        } else {
+          res.status(200).json({
+            status: "Success",
+            message: "No fields to update",
+          });
+        }
+      } catch (e) {
+        console.error(e);
         res.status(400).json({
-            status: 'Failed',
-            message: 'Invalid cours ID provided',
+          status: "Failed",
+          message: "Request failed",
         });
+      }
+    } else {
+      res.status(400).json({
+        status: "Failed",
+        message: "Invalid cours ID provided or insufficient role",
+      });
     }
-}
-
-export function createMasterclassQuizz(req, res) {
+  }
+  
+  export function createMasterclassQuizz(req, res) {
     const { idQuizz, title, masterclassID, page, role } = req.body;
     const slug = title.toLowerCase().replaceAll(' ', '_');
-    
+  
     if (idQuizz && title && slug && masterclassID && page && role === "admin") {
-        try {
-            pool.query(
-            `INSERT INTO masterclassQuizz (idQuizz, title, slug, masterclassID, page) VALUES (${idQuizz}, '${title}', '${slug}','${masterclassID}','${page}');`
-            ).then((result) => {
-            const insertedIdBigInt = result.insertId;
-            
-            const insertedId = Number(insertedIdBigInt);
-    
-            res.status(202).json({
-                status: "Success",
-                insertedId: insertedId, 
-            });
-            });
-        } catch (e) {
-            res.status(400).json({
-            status: 'Failed',
-            message: 'Request failed',
-            });
-        }
-    }
-}
+      try {
+        pool.query(
+          `INSERT INTO masterclassQuizz (idQuizz, title, slug, masterclassID, page) VALUES (?, ?, ?, ?, ?)`,
+          [idQuizz, title, slug, masterclassID, page]
+        ).then((result) => {
+          const insertedIdBigInt = result.insertId;
+          const insertedId = Number(insertedIdBigInt);
   
-  
-
-export function updateMasterclassQuizz(req, res) {
-    const {quizzId, idQuizz, title, masterclassID, page, role } = req.body;
-
-    const slug = title.toLowerCase().replaceAll(' ', '_');
-
-    if (quizzId && role=="admin") {
-        try {
-            let updateQuery = "UPDATE masterclassQuizz SET ";
-            let updateFields = [];
-
-            if (idQuizz !== "") {
-                updateFields.push(`idQuizz = '${idQuizz}'`);
-            }
-
-            if (title !== "") {
-                updateFields.push(`title = '${title}'`);
-            }
-
-            if (slug !== "") {
-                updateFields.push(`slug = '${slug}'`);
-            }
-
-            if (masterclassID !== "") {
-                updateFields.push(`masterclassID = '${masterclassID}'`);
-            }
-
-            if (page !== "") {
-                updateFields.push(`page = '${page}'`);
-            }
-
-            if (updateFields.length > 0) {
-                updateQuery += updateFields.join(", ") + ` WHERE id = ${quizzId}`;
-
-                pool.query(updateQuery).then((result) => {
-                    res.status(200).json({
-                        status: "Success",
-                        message: "MasterclassQuizz updated successfully"
-                    });
-                });
-            } else {
-                res.status(200).json({
-                    status: "Success",
-                    message: "No fields to update"
-                });
-            }
-        } catch (e) {
-            res.status(400).json({
-                status: 'Failed',
-                message: 'Request failed',
-            });
-        }
-    } else {
-        res.status(400).json({
-            status: 'Failed',
-            message: 'Invalid quizz ID provided',
+          res.status(202).json({
+            status: "Success",
+            insertedId: insertedId,
+          });
         });
+      } catch (e) {
+        res.status(400).json({
+          status: 'Failed',
+          message: 'Request failed',
+        });
+      }
+    } else {
+      res.status(400).json({
+        status: 'Failed',
+        message: 'Invalid or missing data in the request',
+      });
     }
-}
-
-export function createMasterclassQuizzQuestions(req, res) {
+  }
+  
+  export function updateMasterclassQuizz(req, res) {
+    const { quizzId, idQuizz, title, masterclassID, page, role } = req.body;
+    const slug = title.toLowerCase().replaceAll(' ', '_');
+  
+    if (quizzId && role === "admin") {
+      try {
+        let updateQuery = "UPDATE masterclassQuizz SET ";
+        let updateFields = [];
+        let values = [];
+  
+        if (idQuizz !== "") {
+          updateFields.push(`idQuizz = ?`);
+          values.push(idQuizz);
+        }
+  
+        if (title !== "") {
+          updateFields.push(`title = ?`);
+          values.push(title);
+        }
+  
+        if (slug !== "") {
+          updateFields.push(`slug = ?`);
+          values.push(slug);
+        }
+  
+        if (masterclassID !== "") {
+          updateFields.push(`masterclassID = ?`);
+          values.push(masterclassID);
+        }
+  
+        if (page !== "") {
+          updateFields.push(`page = ?`);
+          values.push(page);
+        }
+  
+        if (updateFields.length > 0) {
+          values.push(quizzId);
+          updateQuery += updateFields.join(", ") + " WHERE id = ?";
+  
+          pool.query(updateQuery, values).then((result) => {
+            res.status(200).json({
+              status: "Success",
+              message: "MasterclassQuizz updated successfully",
+            });
+          });
+        } else {
+          res.status(200).json({
+            status: "Success",
+            message: "No fields to update",
+          });
+        }
+      } catch (e) {
+        res.status(400).json({
+          status: 'Failed',
+          message: 'Request failed',
+        });
+      }
+    } else {
+      res.status(400).json({
+        status: 'Failed',
+        message: 'Invalid quizz ID provided',
+      });
+    }
+  }
+  
+  export function createMasterclassQuizzQuestions(req, res) {
     const { idQuestion, masterclassQuizzID, question, answer1, answer2, answer3, answer4, correct, role } = req.body;
   
     if (idQuestion && masterclassQuizzID && question && answer1 && answer2 && answer3 && answer4 && correct && role === 'admin') {
@@ -674,7 +714,7 @@ export function createMasterclassQuizzQuestions(req, res) {
             });
           }
         });
-      } catch (e) { 
+      } catch (e) {
         console.error('Erreur lors de la tentative d\'insertion :', e);
         res.status(400).json({
           status: 'Failed',
@@ -688,255 +728,281 @@ export function createMasterclassQuizzQuestions(req, res) {
       });
     }
   }
-
-export function updateMasterclassQuizzQuestions(req, res) {
-    const {questionID, idQuestion, masterclassQuizzID, question, answer1, answer2, answer3, answer4, correct, role } = req.body;
-
-    if (questionID && role=="admin") {
-        try {
-            let updateQuery = "UPDATE masterclassQuizzQuestions SET ";
-            let updateFields = [];
-
-            if (idQuestion !== "") {
-                updateFields.push(`idQuestion = ${idQuestion}`);
-            }
-
-            if (masterclassQuizzID !== "") {
-                updateFields.push(`masterclassQuizzID = '${masterclassQuizzID}'`);
-            }
-
-            if (question !== "") {
-                updateFields.push(`question = '${question}'`);
-            }
-
-            if (answer1 !== "") {
-                updateFields.push(`answer1 = '${answer1}'`);
-            }
-
-            if (answer2 !== "") {
-                updateFields.push(`answer2 = '${answer2}'`);
-            }
-
-            if (answer3 !== "") {
-                updateFields.push(`answer3 = '${answer3}'`);
-            }
-
-            if (answer4 !== "") {
-                updateFields.push(`answer4 = '${answer4}'`);
-            }
-
-            if (correct !== "") {
-                updateFields.push(`correct = '${correct}'`);
-            }
-
-            if (updateFields.length > 0) {
-                updateQuery += updateFields.join(", ") + ` WHERE id = ${questionID};`;
-
-                pool.query(updateQuery).then((result) => {
-                    res.status(200).json({
-                        status: "Success",
-                        message: "MasterclassQuizzQuestions updated successfully"
-                    });
-                });
-            } else {
-                res.status(200).json({
-                    status: "Success",
-                    message: "No fields to update"
-                });
-            }
-        } catch (e) {
-            res.status(400).json({
-                status: 'Failed',
-                message: 'Request failed',
-            });
+  
+  export function updateMasterclassQuizzQuestions(req, res) {
+    const { questionID, idQuestion, masterclassQuizzID, question, answer1, answer2, answer3, answer4, correct, role } = req.body;
+  
+    if (questionID && role === "admin") {
+      try {
+        let updateQuery = "UPDATE masterclassQuizzQuestions SET ";
+        let updateFields = [];
+        let values = [];
+  
+        if (idQuestion !== "") {
+          updateFields.push(`idQuestion = ?`);
+          values.push(idQuestion);
         }
-    } else {
+  
+        if (masterclassQuizzID !== "") {
+          updateFields.push(`masterclassQuizzID = ?`);
+          values.push(masterclassQuizzID);
+        }
+  
+        if (question !== "") {
+          updateFields.push(`question = ?`);
+          values.push(question);
+        }
+  
+        if (answer1 !== "") {
+          updateFields.push(`answer1 = ?`);
+          values.push(answer1);
+        }
+  
+        if (answer2 !== "") {
+          updateFields.push(`answer2 = ?`);
+          values.push(answer2);
+        }
+  
+        if (answer3 !== "") {
+          updateFields.push(`answer3 = ?`);
+          values.push(answer3);
+        }
+  
+        if (answer4 !== "") {
+          updateFields.push(`answer4 = ?`);
+          values.push(answer4);
+        }
+  
+        if (correct !== "") {
+          updateFields.push(`correct = ?`);
+          values.push(correct);
+        }
+  
+        if (updateFields.length > 0) {
+          values.push(questionID);
+          updateQuery += updateFields.join(", ") + " WHERE id = ?";
+  
+          pool.query(updateQuery, values).then((result) => {
+            res.status(200).json({
+              status: "Success",
+              message: "MasterclassQuizzQuestions updated successfully",
+            });
+          });
+        } else {
+          res.status(200).json({
+            status: "Success",
+            message: "No fields to update",
+          });
+        }
+      } catch (e) {
         res.status(400).json({
-            status: 'Failed',
-            message: 'Invalid question ID provided',
+          status: 'Failed',
+          message: 'Request failed',
         });
+      }
+    } else {
+      res.status(400).json({
+        status: 'Failed',
+        message: 'Invalid question ID provided',
+      });
     }
-}
-
-
-export function createMasterclassExams(req, res) {
+  }
+  
+  export function createMasterclassExams(req, res) {
     const { idExams, title, masterclassID, page, role } = req.body;
     const slug = title.toLowerCase().replaceAll(' ', '_');
-    
+  
     if (idExams && title && slug && masterclassID && page && role === "admin") {
-        try {
-            pool.query(
-            `INSERT INTO masterclassExams (idExams, title, slug, masterclassID, page) VALUES (${idExams}, '${title}', '${slug}','${masterclassID}','${page}');`
-            ).then((result) => {
-            const insertedIdBigInt = result.insertId;
-            
-            const insertedId = Number(insertedIdBigInt);
-    
-            res.status(202).json({
-                status: "Success",
-                insertedId: insertedId, 
-            });
-            });
-        } catch (e) {
-            res.status(400).json({
-            status: 'Failed',
-            message: 'Request failed',
-            });
-        }
+      try {
+        pool.query(
+          `INSERT INTO masterclassExams (idExams, title, slug, masterclassID, page) VALUES (?, ?, ?, ?, ?)`,
+          [idExams, title, slug, masterclassID, page]
+        ).then((result) => {
+          const insertedIdBigInt = result.insertId;
+          const insertedId = Number(insertedIdBigInt);
+  
+          res.status(202).json({
+            status: "Success",
+            insertedId: insertedId,
+          });
+        });
+      } catch (e) {
+        res.status(400).json({
+          status: 'Failed',
+          message: 'Request failed',
+        });
+      }
+    } else {
+      res.status(400).json({
+        status: 'Failed',
+        message: 'Invalid or missing data in the request',
+      });
     }
-}
+  }
   
-  
-
-export function updateMasterclassExams(req, res) {
-    const {examsId, idExams, title, masterclassID, page, role } = req.body;
- 
+  export function updateMasterclassExams(req, res) {
+    const { examsId, idExams, title, masterclassID, page, role } = req.body;
     const slug = title.toLowerCase().replaceAll(' ', '_');
-
-    if (examsId && role=="admin") {
-        try {
-            let updateQuery = "UPDATE masterclassExams SET ";
-            let updateFields = [];
-
-            if (idExams !== "") {
-                updateFields.push(`idExams = '${idExams}'`);
-            }
-
-            if (title !== "") {
-                updateFields.push(`title = '${title}'`);
-            }
-
-            if (slug !== "") {
-                updateFields.push(`slug = '${slug}'`);
-            }
-
-            if (masterclassID !== "") {
-                updateFields.push(`masterclassID = '${masterclassID}'`);
-            }
-
-            if (page !== "") {
-                updateFields.push(`page = '${page}'`);
-            }
-
-            if (updateFields.length > 0) {
-                updateQuery += updateFields.join(", ") + ` WHERE id = ${examsId}`;
-
-                pool.query(updateQuery).then((result) => {
-                    res.status(200).json({
-                        status: "Success",
-                        message: "MasterclassExams updated successfully"
-                    });
-                });
-            } else {
-                res.status(200).json({
-                    status: "Success",
-                    message: "No fields to update"
-                });
-            }
-        } catch (e) {
-            res.status(400).json({
-                status: 'Failed',
-                message: 'Request failed',
-            });
+  
+    if (examsId && role === "admin") {
+      try {
+        let updateQuery = "UPDATE masterclassExams SET ";
+        let updateFields = [];
+        let values = [];
+  
+        if (idExams !== "") {
+          updateFields.push(`idExams = ?`);
+          values.push(idExams);
         }
-    } else {
-        res.status(400).json({
-            status: 'Failed',
-            message: 'Invalid exams ID provided',
-        });
-    }
-}
-
-export function createMasterclassExamsQuestions(req, res){
-    const {idExamsQuestions, masterclassExamsID, question, answer1, answer2, answer3, answer4, correct, role} = req.body;
-    if (idExamsQuestions, masterclassExamsID, question, answer1, answer2, answer3, answer4, correct && role=="admin") { 
-        try {
-            pool 
-                .query(
-                    `INSERT INTO masterclassExamsQuestions (idExamsQuestions, masterclassExamsID, question, answer1, answer2, answer3, answer4, correct) VALUES (${idExamsQuestions},'${masterclassExamsID}','${question}','${answer1}','${answer2}','${answer3}','${answer4}','${correct}');`
-                )
-                .then((result) => {
-                    res.status(202).json({
-                        status: "Success"
-                    });
-                });
-        } catch (e) {
-            res.status(400).json({
-                status: 'Failed',
-                message: 'Request failed',
-            });
-        } 
-    }
-}
-
-export function updateMasterclassExamsQuestions(req, res) {
-    const {questionID, idExamsQuestions, masterclassExamsID, question, answer1, answer2, answer3, answer4, correct, role } = req.body;
-
-
-    if (questionID && role=="admin") {
-        try {
-            let updateQuery = "UPDATE masterclassExamsQuestions SET ";
-            let updateFields = [];
-
-            if (idExamsQuestions !== "") {
-                updateFields.push(`idExamsQuestions = ${idExamsQuestions}`);
-            }
-
-            if (masterclassExamsID !== "") {
-                updateFields.push(`masterclassExamsID = '${masterclassExamsID}'`);
-            }
-
-            if (question !== "") {
-                updateFields.push(`question = '${question}'`);
-            }
-
-            if (answer1 !== "") {
-                updateFields.push(`answer1 = '${answer1}'`);
-            }
-
-            if (answer2 !== "") {
-                updateFields.push(`answer2 = '${answer2}'`);
-            }
-
-            if (answer3 !== "") {
-                updateFields.push(`answer3 = '${answer3}'`);
-            }
-
-            if (answer4 !== "") {
-                updateFields.push(`answer4 = '${answer4}'`);
-            }
-
-            if (correct !== "") {
-                updateFields.push(`correct = '${correct}'`);
-            }
-
-            if (updateFields.length > 0) {
-                updateQuery += updateFields.join(", ") + ` WHERE id = ${questionID};`;
-
-                pool.query(updateQuery).then((result) => {
-                    res.status(200).json({
-                        status: "Success",
-                        message: "MasterclassExamsQuestions updated successfully"
-                    });
-                });
-            } else {
-                res.status(200).json({
-                    status: "Success",
-                    message: "No fields to update"
-                });
-            }
-        } catch (e) {
-            res.status(400).json({
-                status: 'Failed',
-                message: 'Request failed',
-            });
+  
+        if (title !== "") {
+          updateFields.push(`title = ?`);
+          values.push(title);
         }
-    } else {
+  
+        if (slug !== "") {
+          updateFields.push(`slug = ?`);
+          values.push(slug);
+        }
+  
+        if (masterclassID !== "") {
+          updateFields.push(`masterclassID = ?`);
+          values.push(masterclassID);
+        }
+  
+        if (page !== "") {
+          updateFields.push(`page = ?`);
+          values.push(page);
+        }
+  
+        if (updateFields.length > 0) {
+          values.push(examsId);
+          updateQuery += updateFields.join(", ") + " WHERE id = ?";
+  
+          pool.query(updateQuery, values).then((result) => {
+            res.status(200).json({
+              status: "Success",
+              message: "MasterclassExams updated successfully",
+            });
+          });
+        } else {
+          res.status(200).json({
+            status: "Success",
+            message: "No fields to update",
+          });
+        }
+      } catch (e) {
         res.status(400).json({
-            status: 'Failed',
-            message: 'Invalid question ID provided',
+          status: 'Failed',
+          message: 'Request failed',
         });
+      }
+    } else {
+      res.status(400).json({
+        status: 'Failed',
+        message: 'Invalid exams ID provided',
+      });
     }
-}
-
-
+  }
+  
+  export function createMasterclassExamsQuestions(req, res) {
+    const { idExamsQuestions, masterclassExamsID, question, answer1, answer2, answer3, answer4, correct, role } = req.body;
+  
+    if (idExamsQuestions && masterclassExamsID && question && answer1 && answer2 && answer3 && answer4 && correct && role === 'admin') {
+      try {
+        pool.query(
+          `INSERT INTO masterclassExamsQuestions (idExamsQuestions, masterclassExamsID, question, answer1, answer2, answer3, answer4, correct) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [idExamsQuestions, masterclassExamsID, question, answer1, answer2, answer3, answer4, correct]
+        ).then((result) => {
+          res.status(202).json({
+            status: "Success"
+          });
+        });
+      } catch (e) {
+        res.status(400).json({
+          status: 'Failed',
+          message: 'Request failed',
+        });
+      }
+    }
+  }
+  
+  export function updateMasterclassExamsQuestions(req, res) {
+    const { questionID, idExamsQuestions, masterclassExamsID, question, answer1, answer2, answer3, answer4, correct, role } = req.body;
+  
+    if (questionID && role === "admin") {
+      try {
+        let updateQuery = "UPDATE masterclassExamsQuestions SET ";
+        let updateFields = [];
+        let values = [];
+  
+        if (idExamsQuestions !== "") {
+          updateFields.push(`idExamsQuestions = ?`);
+          values.push(idExamsQuestions);
+        }
+  
+        if (masterclassExamsID !== "") {
+          updateFields.push(`masterclassExamsID = ?`);
+          values.push(masterclassExamsID);
+        }
+  
+        if (question !== "") {
+          updateFields.push(`question = ?`);
+          values.push(question);
+        }
+  
+        if (answer1 !== "") {
+          updateFields.push(`answer1 = ?`);
+          values.push(answer1);
+        }
+  
+        if (answer2 !== "") {
+          updateFields.push(`answer2 = ?`);
+          values.push(answer2);
+        }
+  
+        if (answer3 !== "") {
+          updateFields.push(`answer3 = ?`);
+          values.push(answer3);
+        }
+  
+        if (answer4 !== "") {
+          updateFields.push(`answer4 = ?`);
+          values.push(answer4);
+        }
+  
+        if (correct !== "") {
+          updateFields.push(`correct = ?`);
+          values.push(correct);
+        }
+  
+        if (updateFields.length > 0) {
+          values.push(questionID);
+          updateQuery += updateFields.join(", ") + " WHERE id = ?";
+  
+          pool.query(updateQuery, values).then((result) => {
+            res.status(200).json({
+              status: "Success",
+              message: "MasterclassExamsQuestions updated successfully",
+            });
+          });
+        } else {
+          res.status(200).json({
+            status: "Success",
+            message: "No fields to update",
+          });
+        }
+      } catch (e) {
+        res.status(400).json({
+          status: 'Failed',
+          message: 'Request failed',
+        });
+      }
+    } else {
+      res.status(400).json({
+        status: 'Failed',
+        message: 'Invalid question ID provided',
+      });
+    }
+  }
+  

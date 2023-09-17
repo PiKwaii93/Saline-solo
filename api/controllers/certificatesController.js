@@ -132,16 +132,19 @@ export function newUsersCertificates(req, res) {
 }
 
 export function createCertificates(req, res) {
-    const { title, masterclassID, role } = req.body;  
-    console.log(title, masterclassID, role )
+    const { title, masterclassID, role } = req.body;
 
-    if (title, masterclassID && role === "admin") { 
+    if (title && masterclassID && role === "admin") {
         try {
             pool.query(
                 `INSERT INTO certificates (title, masterclassID) VALUES ('${title}', '${masterclassID}')`
             ).then((result) => {
+                const insertedIdBigInt = result.insertId;
+                const insertedId = Number(insertedIdBigInt);
+
                 res.status(202).json({
-                    status: "Success"
+                    status: "Success",
+                    insertedId: insertedId, 
                 });
             });
         } catch (e) {
@@ -149,7 +152,7 @@ export function createCertificates(req, res) {
                 status: 'Failed',
                 message: 'Request failed',
             });
-        } 
+        }
     } else {
         res.status(400).json({
             status: 'Failed',

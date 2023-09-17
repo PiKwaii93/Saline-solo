@@ -24,8 +24,6 @@ export function login(req, res) {
                       expiresIn: jwtExpirySeconds,
                     }
                   );
-                  console.log("token : " + token)
-                  console.log(response)
                   res.cookie('access_token', token);
                   res.status(202).json({
                     status: 'Success',

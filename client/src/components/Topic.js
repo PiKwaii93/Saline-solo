@@ -64,7 +64,7 @@ export default function Topic(){
 
     useEffect(()=>{
         if(dataTopic.id!=""){
-            categoryFindOneByID(dataTopic.categoryID).then(data=>{setDataCategory(data.result[0])})
+            categoryFindOneByID(dataTopic.categoryID).then(data=>{if(data.result.length!=0)setDataCategory(data.result[0])})
         }
     },[dataTopic])
 

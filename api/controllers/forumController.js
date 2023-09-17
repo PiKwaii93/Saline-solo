@@ -169,7 +169,6 @@ export function messageFindOneByID(req, res) {
 
 export function messageFindOneByTopic(req, res) {
     const {topicID} = req.body
-    console.log(topicID)
     if(topicID)
     try {
         pool

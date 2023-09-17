@@ -5,13 +5,17 @@ import { login, register, updateUsersInformation, updateUsersPassword, findUserB
 import multer from 'multer'
 import * as fs from 'fs';
 import path from 'path';
-import { masterclassAll, masterclassByID, masterclassCheckConfirmModule, masterclassCheckConfirmModuleFindOne, masterclassCheckConfirmModuleByUserID, masterclassConfirmModule, masterclassFindOne, masterclasscours, masterclasscoursAll, masterclassQuizzAllByMasterclassID, masterclassExamsAllByMasterclassID, masterclassQuizz, masterclassQuizzQuestion, masterclassExamsAll, masterclassExams, masterclassExamsQuestion, createMasterclass, getLastMasterclass, updateMasterclass, createMasterclassCours, updateMasterclassCours, createMasterclassQuizz, updateMasterclassQuizz, createMasterclassQuizzQuestions, updateMasterclassQuizzQuestions, createMasterclassExams, updateMasterclassExams, createMasterclassExamsQuestions, updateMasterclassExamsQuestions } from '../controllers/masterclassController.js';
+import { masterclassAll, masterclassByID, masterclassCheckConfirmModule, masterclassCheckConfirmModuleFindOne, masterclassCheckConfirmModuleByUserID, masterclassConfirmModule, masterclassFindOne, masterclasscours, masterclasscoursAll, masterclassQuizzAllByMasterclassID, masterclassExamsAllByMasterclassID, masterclassQuizz, masterclassQuizzQuestion, masterclassExamsAll,getMasterclassExxamsAll, masterclassExams, masterclassExamsQuestion, createMasterclass, getLastMasterclass, updateMasterclass, createMasterclassCours, updateMasterclassCours, createMasterclassQuizz, updateMasterclassQuizz, createMasterclassQuizzQuestions, updateMasterclassQuizzQuestions, createMasterclassExams, updateMasterclassExams, createMasterclassExamsQuestions, updateMasterclassExamsQuestions } from '../controllers/masterclassController.js';
 import { certificatesAll, certificatesFindOneByMasterclassID, usersCertificates, newUsersCertificates, checkUsersCertificates, certificatesFindOneByCertificatesID, createCertificates } from '../controllers/certificatesController.js';
 import { topicAll, topicFindOneByID, topicFindOneByCategory, topicFindOneByAuthor, createTopic, messageAll, messageFindOneByID, messageFindOneByTopic, messageFindOneByAuthor, createMessage,  categoryAll, categoryFindOneByID } from '../controllers/forumController.js';
 import { getImageByUserID, getImageByMasterclassID, getImageByCertificatesID } from '../controllers/mediaController.js';
 import { planningByDate, userEventByUserID, planningByID } from '../controllers/planningController.js';
 
 const router = express.Router();
+
+
+router.use(express.json());
+router.use(express.urlencoded({ extended: true }));
 
 router.get('/meow', function(req, res){
     res.send('meow');
@@ -52,6 +56,8 @@ router.post('/masterclassQuizz', masterclassQuizz)
 router.post('/masterclassQuizzQuestion', masterclassQuizzQuestion)
 
 router.post('/masterclassExamsAll', masterclassExamsAll)
+
+router.get('/getMasterclassExxamsAll', getMasterclassExxamsAll)
 
 router.post('/masterclassExams', masterclassExams)
 
@@ -175,9 +181,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-router.use(express.json());
-router.use(express.urlencoded({ extended: true }));
-
 router.post('/uploadVideo/cours', upload.single('video'), async (req, res) => {
   
   console.log('Début du traitement de la requête POST /uploadVideo/cours');
@@ -254,16 +257,13 @@ const storageImageProfil = multer.diskStorage({
 
 const uploadImageProfil = multer({ storage: storageImageProfil }); 
 
-router.use(express.json());
-router.use(express.urlencoded({ extended: true }));
-
 router.post('/uploadImage/profil', uploadImageProfil.single('image'), async (req, res) => {
   
   console.log('Début du traitement de la requête POST /uploadImage/profil');
 
   try {
     const { id } = req.body;
-    console.log('ID de l\'utilisateur :', id);
+    console.log('ID  :', id);
 
     if (!req.file) {
       console.error('Aucune image n\'a été téléchargée.');
@@ -342,16 +342,13 @@ const storageImageMasterclass = multer.diskStorage({
 
 const uploadImageMasterclass = multer({ storage: storageImageMasterclass }); 
 
-router.use(express.json());
-router.use(express.urlencoded({ extended: true }));
-
 router.post('/uploadImage/masterclass', uploadImageMasterclass.single('image'), async (req, res) => {
   
   console.log('Début du traitement de la requête POST /uploadImage/masterclass');
 
   try {
     const { id } = req.body;
-    console.log('ID de l\'utilisateur :', id);
+    console.log('ID  :', id);
 
     if (!req.file) {
       console.error('Aucune image n\'a été téléchargée.');
@@ -429,25 +426,20 @@ const storageImageCertificates = multer.diskStorage({
   },
 });
 
-const uploadImageCertificates = multer({ storage: storageImageCertificates }); // Utilisez directement la configuration dans multer
+const uploadImageCertificates = multer({ storage: storageImageCertificates }); 
 
-// Middleware pour gérer les requêtes POST multipart/form-data
-router.use(express.json());
-router.use(express.urlencoded({ extended: true }));
-
-// Route pour gérer l'upload de l'image et le stockage des métadonnées
 router.post('/uploadImage/certificates', uploadImageCertificates.single('image'), async (req, res) => {
   
   console.log('Début du traitement de la requête POST /uploadImage/certificates');
 
   try {
     const { id } = req.body;
-    console.log('ID de l\'utilisateur :', id);
+    console.log('ID  :', id);
 
     if (!req.file) {
       console.error('Aucune image n\'a été téléchargée.');
       throw new Error('Aucune image n\'a été téléchargée.');
-    }
+    } 
 
     console.log('Fichier image téléchargé :', req.file.originalname);
     const filename = req.file.originalname;
@@ -456,8 +448,8 @@ router.post('/uploadImage/certificates', uploadImageCertificates.single('image')
     console.log(extension)
     const imageURL = `/uploadImage/certificates/${filename}`;
     
-    const cheminAncienFichier = backAppURL + `/uploadImage/certificates/${filename}`; // Chemin complet de l'ancien fichier
-    const cheminNouveauFichier = backAppURL + `/uploadImage/certificates/${id}-certificates.png`; // Chemin complet du nouveau fichier
+    const cheminAncienFichier = backAppURL + `/uploadImage/certificates/${filename}`; 
+    const cheminNouveauFichier = backAppURL + `/uploadImage/certificates/${id}-certificates.png`; 
 
     fs.rename(cheminAncienFichier, cheminNouveauFichier, (err) => {
       if (err) {
@@ -482,7 +474,6 @@ router.post('/uploadImage/certificates', uploadImageCertificates.single('image')
   
 });
 
-// Fonction pour insérer les métadonnées de la vidéo dans la base de données
 async function insertImageCertificatesMetadata(id, imageURL) {
   console.log('Mise à jour des métadonnées de l\'image dans la base de données');
   let conn;
@@ -502,5 +493,4 @@ async function insertImageCertificatesMetadata(id, imageURL) {
 }
 
 
-//export this router to use in our index.js
 export default router

@@ -12,6 +12,7 @@ import useMasterclassExams from "../hooks/useMasterclassExams";
 import useMasterclassExamsQuestion from "../hooks/useMasterclassExamsQuestion";
 import useCreateCertificates from "../hooks/useCreateCertificates";
 import useCertificatesFindOneByMasterclassID from "../hooks/useCertificatesFindOneByMasterclassID";
+import useGetMasterclassExamsAll from "../hooks/useGetMasterclassExamsAll";
 
 import CreateExamsGenerator from "./CreateExamsGenerator";
 import useCreateMasterclassCours from "../hooks/useCreateMasterclassCours";
@@ -62,6 +63,8 @@ export default function CreateExams(){
         masterclassID : "",
         title : ""
     })
+
+    const [dataAllMasterclassExams, setDataAllMasterclassExams] = useState([])
     
 
     const masterclassesCoursAll = useMasterclassesCoursAll()
@@ -84,6 +87,8 @@ export default function CreateExams(){
     
     const createMasterclassCours = useCreateMasterclassCours();
 
+    const getMasterclassExamsAll = useGetMasterclassExamsAll()
+
     
 
     const createCertificates = useCreateCertificates()
@@ -95,6 +100,7 @@ export default function CreateExams(){
         setCheckQuestionsSend(false)
         setAllMasterclassExams([])
         masterclassAll().then(data => {setAllMasterclassTemp(data.result)})
+        getMasterclassExamsAll().then(data=>{setDataAllMasterclassExams(data.result)})
     },[checkSuccess])
 
     useEffect(()=>{
@@ -196,14 +202,15 @@ export default function CreateExams(){
     const handleSubmit = (e) => {
         e.preventDefault();
         if(createExamsInfo.examsId!=""){
-            updateMasterclassExams(createExamsInfo).then(data=>{console.log(data)})
+            
             if (fileImage) {
                 const formData = new FormData();
                 formData.append('image', fileImage);
                 formData.append('id', createExamsInfo.examsId) 
-      
+    
                 uploadCertificates(formData).then(data => console.log(data))
             }
+            updateMasterclassExams(createExamsInfo).then(data=>{console.log(data)})
             for(let x=0;x<allQuestions.length; x++){
                 if(allQuestionsCheck[x]!=undefined){
                     if(allQuestions[x].id == allQuestionsCheck[x].id){
@@ -235,7 +242,16 @@ export default function CreateExams(){
                 setAllQuestionsToSend(newAllQuestionsArray)
                 setCheckQuestionsSend(true)
             })
-            createCertificates(certificatesInfo, user.role).then(data=>{console.log(data)})
+            createCertificates(certificatesInfo, user.role).then(data=>{
+                console.log(data); 
+                if (fileImage) {
+                    const formData = new FormData();
+                    formData.append('image', fileImage);
+                    formData.append('id', data.insertedId) 
+        
+                    uploadCertificates(formData).then(data => console.log(data))
+                }
+            })
             setCheckSuccess(true)
         }
         

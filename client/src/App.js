@@ -75,6 +75,10 @@ export default function App() {
                           <Route path="/create-topic" element={<CreateTopic/>}/>
                           <Route path="/video-upload" element={<VideoUploadForm/>}/>
                           <Route path="/planning" element={<Planning/>}/>
+                          <Route path="/masterclasses" element={<Masterclasses/>} />
+                          <Route path="/masterclassroom/:slug/:page" element={<Masterclassroom/>} />
+                          <Route path="/forum" element={<Forum/>}/>
+                          <Route path="/topic/:idTopic" element={<Topic/>}/>
                           {user.role=="admin" && (
                             <>
                               <Route path="/create-cours" element={<CreateCours/>}/>

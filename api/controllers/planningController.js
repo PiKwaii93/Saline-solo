@@ -25,7 +25,6 @@ export function planningByDate(req, res) {
 
 export function planningByID(req, res) {
     const { planningEventID } = req.body;
-    console.log(planningEventID)
     if (planningEventID) {
         try {
             pool
